@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 use Migrations\BaseMigration;
 
-class CreateBillSupplements extends BaseMigration
+class CreateBillRecordTexts extends BaseMigration
 {
     /**
      * Change Method.
@@ -16,12 +16,12 @@ class CreateBillSupplements extends BaseMigration
     public function change(): void
     {
         $this
-            ->table('bill_supplements')
-            ->addColumn('bill_id', 'integer', [
+            ->table('bill_record_texts')
+            ->addColumn('bill_record_id', 'integer', [
                 'default' => null,
                 'null' => false,
             ])
-            ->addColumn('supplement_id', 'integer', [
+            ->addColumn('doc_id', 'integer', [
                 'default' => null,
                 'null' => true,
                 'signed' => false,
@@ -38,14 +38,6 @@ class CreateBillSupplements extends BaseMigration
                 'default' => null,
                 'null' => true,
                 'signed' => false,
-            ])
-            ->addColumn('title', 'string', [
-                'default' => null,
-                'null' => true,
-            ])
-            ->addColumn('description', 'string', [
-                'default' => null,
-                'null' => true,
             ])
             ->addColumn('mime', 'string', [
                 'default' => null,
@@ -64,12 +56,40 @@ class CreateBillSupplements extends BaseMigration
                 'default' => null,
                 'null' => true,
             ])
-            ->addColumn('supplement_size', 'integer', [
+            ->addColumn('text_size', 'integer', [
                 'default' => null,
                 'null' => true,
                 'signed' => false,
             ])
-            ->addColumn('supplement_hash', 'string', [
+            ->addColumn('text_hash', 'string', [
+                'default' => null,
+                'null' => true,
+            ])
+            ->addColumn('alt_bill_text', 'integer', [
+                'default' => null,
+                'null' => true,
+                'signed' => false,
+            ])
+            ->addColumn('alt_mime', 'string', [
+                'default' => null,
+                'null' => true,
+            ])
+            ->addColumn('alt_mime_id', 'integer', [
+                'default' => null,
+                'null' => true,
+                'signed' => false,
+            ])
+            ->addColumn('alt_state_link', 'string', [
+                'default' => null,
+                'null' => true,
+                'signed' => false,
+            ])
+            ->addColumn('alt_text_size', 'integer', [
+                'default' => null,
+                'null' => true,
+                'signed' => false,
+            ])
+            ->addColumn('alt_text_hash', 'string', [
                 'default' => null,
                 'null' => true,
             ])

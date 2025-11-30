@@ -4,7 +4,7 @@ declare(strict_types=1);
 use Migrations\BaseMigration;
 use Migrations\Db\Adapter\MysqlAdapter;
 
-class CreateBillSponsors extends BaseMigration
+class CreateBillRecordSponsors extends BaseMigration
 {
     /**
      * Change Method.
@@ -17,8 +17,8 @@ class CreateBillSponsors extends BaseMigration
     public function change(): void
     {
         $this
-            ->table('bill_sponsors')
-            ->addColumn('bill_id', 'integer', [
+            ->table('bill_record_sponsors')
+            ->addColumn('bill_record_id', 'integer', [
                 'default' => null,
                 'null' => false,
             ])

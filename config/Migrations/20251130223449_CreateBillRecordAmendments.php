@@ -2,9 +2,8 @@
 declare(strict_types=1);
 
 use Migrations\BaseMigration;
-use Migrations\Db\Adapter\MysqlAdapter;
 
-class CreateBillSessions extends BaseMigration
+class CreateBillRecordAmendments extends BaseMigration
 {
     /**
      * Change Method.
@@ -17,63 +16,64 @@ class CreateBillSessions extends BaseMigration
     public function change(): void
     {
         $this
-            ->table('bill_sessions')
-            ->addColumn('bill_id', 'integer', [
+            ->table('bill_record_amendments')
+            ->addColumn('bill_record_id', 'integer', [
                 'default' => null,
                 'null' => false,
             ])
-            ->addColumn('session_id', 'integer', [
+            ->addColumn('amendment_id', 'integer', [
                 'default' => null,
                 'null' => true,
                 'signed' => false,
             ])
-            ->addColumn('state_id', 'integer', [
+            ->addColumn('adopted', 'integer', [
                 'default' => null,
                 'null' => true,
                 'signed' => false,
-                'limit' => MysqlAdapter::INT_TINY,
             ])
-            ->addColumn('year_start', 'integer', [
+            ->addColumn('chamber', 'string', [
                 'default' => null,
                 'null' => true,
             ])
-            ->addColumn('year_end', 'integer', [
-                'default' => null,
-                'null' => true,
-            ])
-            ->addColumn('prefile', 'integer', [
+            ->addColumn('chamber_id', 'integer', [
                 'default' => null,
                 'null' => true,
                 'signed' => false,
-                'limit' => MysqlAdapter::INT_TINY,
             ])
-            ->addColumn('sine_die', 'integer', [
+            ->addColumn('date', 'date', [
+                'default' => null,
+                'null' => true,
+            ])
+            ->addColumn('title', 'string', [
+                'default' => null,
+                'null' => true,
+            ])
+            ->addColumn('description', 'string', [
+                'default' => null,
+                'null' => true,
+            ])
+            ->addColumn('mime', 'string', [
+                'default' => null,
+                'null' => true,
+            ])
+            ->addColumn('mime_id', 'integer', [
+                'default' => null,
+                'null' => true,
+            ])
+            ->addColumn('url', 'string', [
+                'default' => null,
+                'null' => true,
+            ])
+            ->addColumn('state_link', 'string', [
+                'default' => null,
+                'null' => true,
+            ])
+            ->addColumn('amendment_size', 'integer', [
                 'default' => null,
                 'null' => true,
                 'signed' => false,
-                'limit' => MysqlAdapter::INT_TINY,
             ])
-            ->addColumn('prior', 'integer', [
-                'default' => null,
-                'null' => true,
-                'signed' => false,
-                'limit' => MysqlAdapter::INT_TINY,
-            ])
-            ->addColumn('special', 'integer', [
-                'default' => null,
-                'null' => true,
-                'signed' => false,
-                'limit' => MysqlAdapter::INT_TINY,
-            ])
-            ->addColumn('session_tag', 'string', [
-                'default' => null,
-                'null' => true,
-            ])
-            ->addColumn('session_title', 'string', [
-                'default' => null,
-                'null' => true,
-            ])
-            ->addColumn('session_name', 'string', [
+            ->addColumn('amendment_hash', 'string', [
                 'default' => null,
                 'null' => true,
             ])

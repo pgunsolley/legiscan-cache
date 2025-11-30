@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 use Migrations\BaseMigration;
 
-class CreateBillCommittees extends BaseMigration
+class CreateBillRecordReferrals extends BaseMigration
 {
     /**
      * Change Method.
@@ -16,10 +16,14 @@ class CreateBillCommittees extends BaseMigration
     public function change(): void
     {
         $this
-            ->table('bill_committees')
-            ->addColumn('bill_id', 'integer', [
+            ->table('bill_record_referrals')
+            ->addColumn('bill_record_id', 'integer', [
                 'default' => null,
                 'null' => false,
+            ])
+            ->addColumn('date', 'date', [
+                'default' => null,
+                'null' => true,
             ])
             ->addColumn('committee_id', 'integer', [
                 'default' => null,

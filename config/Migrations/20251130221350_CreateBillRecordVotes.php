@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 use Migrations\BaseMigration;
 
-class CreateBillTexts extends BaseMigration
+class CreateBillRecordVotes extends BaseMigration
 {
     /**
      * Change Method.
@@ -16,12 +16,12 @@ class CreateBillTexts extends BaseMigration
     public function change(): void
     {
         $this
-            ->table('bill_texts')
-            ->addColumn('bill_id', 'integer', [
+            ->table('bill_record_votes')
+            ->addColumn('bill_record_id', 'integer', [
                 'default' => null,
                 'null' => false,
             ])
-            ->addColumn('doc_id', 'integer', [
+            ->addColumn('roll_call_id', 'integer', [
                 'default' => null,
                 'null' => true,
                 'signed' => false,
@@ -30,20 +30,45 @@ class CreateBillTexts extends BaseMigration
                 'default' => null,
                 'null' => true,
             ])
-            ->addColumn('type', 'string', [
+            ->addColumn('desc', 'string', [
                 'default' => null,
                 'null' => true,
             ])
-            ->addColumn('type_id', 'integer', [
+            ->addColumn('yea', 'integer', [
                 'default' => null,
                 'null' => true,
                 'signed' => false,
             ])
-            ->addColumn('mime', 'string', [
+            ->addColumn('nay', 'integer', [
+                'default' => null,
+                'null' => true,
+                'signed' => false,
+            ])
+            ->addColumn('nv', 'integer', [
+                'default' => null,
+                'null' => true,
+                'signed' => false,
+            ])
+            ->addColumn('absent', 'integer', [
+                'default' => null,
+                'null' => true,
+                'signed' => false,
+            ])
+            ->addColumn('total', 'integer', [
+                'default' => null,
+                'null' => true,
+                'signed' => false,
+            ])
+            ->addColumn('passed', 'integer', [
+                'default' => null,
+                'null' => true,
+                'signed' => false,
+            ])
+            ->addColumn('chamber', 'string', [
                 'default' => null,
                 'null' => true,
             ])
-            ->addColumn('mime_id', 'integer', [
+            ->addColumn('chamber_id', 'integer', [
                 'default' => null,
                 'null' => true,
                 'signed' => false,
@@ -53,43 +78,6 @@ class CreateBillTexts extends BaseMigration
                 'null' => true,
             ])
             ->addColumn('state_link', 'string', [
-                'default' => null,
-                'null' => true,
-            ])
-            ->addColumn('text_size', 'integer', [
-                'default' => null,
-                'null' => true,
-                'signed' => false,
-            ])
-            ->addColumn('text_hash', 'string', [
-                'default' => null,
-                'null' => true,
-            ])
-            ->addColumn('alt_bill_text', 'integer', [
-                'default' => null,
-                'null' => true,
-                'signed' => false,
-            ])
-            ->addColumn('alt_mime', 'string', [
-                'default' => null,
-                'null' => true,
-            ])
-            ->addColumn('alt_mime_id', 'integer', [
-                'default' => null,
-                'null' => true,
-                'signed' => false,
-            ])
-            ->addColumn('alt_state_link', 'string', [
-                'default' => null,
-                'null' => true,
-                'signed' => false,
-            ])
-            ->addColumn('alt_text_size', 'integer', [
-                'default' => null,
-                'null' => true,
-                'signed' => false,
-            ])
-            ->addColumn('alt_text_hash', 'string', [
                 'default' => null,
                 'null' => true,
             ])

@@ -4,7 +4,7 @@ declare(strict_types=1);
 use Migrations\BaseMigration;
 use Migrations\Db\Adapter\MysqlAdapter;
 
-class CreateBills extends BaseMigration
+class CreateBillRecords extends BaseMigration
 {
     /**
      * Change Method.
@@ -17,7 +17,7 @@ class CreateBills extends BaseMigration
     public function change(): void
     {
         $this
-            ->table('bills')
+            ->table('bill_records')
             ->addColumn('bill_id', 'integer', [
                 'default' => null,
                 'null' => true,

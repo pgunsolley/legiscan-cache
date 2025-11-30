@@ -2,8 +2,9 @@
 declare(strict_types=1);
 
 use Migrations\BaseMigration;
+use Migrations\Db\Adapter\MysqlAdapter;
 
-class CreateBillSubjects extends BaseMigration
+class CreateBillRecordProgresses extends BaseMigration
 {
     /**
      * Change Method.
@@ -16,19 +17,20 @@ class CreateBillSubjects extends BaseMigration
     public function change(): void
     {
         $this
-            ->table('bill_subjects')
-            ->addColumn('bill_id', 'integer', [
+            ->table('bill_record_progresses')
+            ->addColumn('bill_record_id', 'integer', [
                 'default' => null,
                 'null' => false,
             ])
-            ->addColumn('subject_id', 'integer', [
+            ->addColumn('date', 'date', [
+                'default' => null,
+                'null' => true,
+            ])
+            ->addColumn('event', 'integer', [
                 'default' => null,
                 'null' => true,
                 'signed' => false,
-            ])
-            ->addColumn('subject_name', 'string', [
-                'default' => null,
-                'null' => true,
+                'limit' => MysqlAdapter::INT_TINY,
             ])
             ->addColumn('created', 'datetime')
             ->addColumn('modified', 'datetime')

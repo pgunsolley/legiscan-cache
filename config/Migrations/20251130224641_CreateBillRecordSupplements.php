@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 use Migrations\BaseMigration;
 
-class CreateBillAmendments extends BaseMigration
+class CreateBillRecordSupplements extends BaseMigration
 {
     /**
      * Change Method.
@@ -16,26 +16,12 @@ class CreateBillAmendments extends BaseMigration
     public function change(): void
     {
         $this
-            ->table('bill_amendments')
-            ->addColumn('bill_id', 'integer', [
+            ->table('bill_record_supplements')
+            ->addColumn('bill_record_id', 'integer', [
                 'default' => null,
                 'null' => false,
             ])
-            ->addColumn('amendment_id', 'integer', [
-                'default' => null,
-                'null' => true,
-                'signed' => false,
-            ])
-            ->addColumn('adopted', 'integer', [
-                'default' => null,
-                'null' => true,
-                'signed' => false,
-            ])
-            ->addColumn('chamber', 'string', [
-                'default' => null,
-                'null' => true,
-            ])
-            ->addColumn('chamber_id', 'integer', [
+            ->addColumn('supplement_id', 'integer', [
                 'default' => null,
                 'null' => true,
                 'signed' => false,
@@ -43,6 +29,15 @@ class CreateBillAmendments extends BaseMigration
             ->addColumn('date', 'date', [
                 'default' => null,
                 'null' => true,
+            ])
+            ->addColumn('type', 'string', [
+                'default' => null,
+                'null' => true,
+            ])
+            ->addColumn('type_id', 'integer', [
+                'default' => null,
+                'null' => true,
+                'signed' => false,
             ])
             ->addColumn('title', 'string', [
                 'default' => null,
@@ -59,6 +54,7 @@ class CreateBillAmendments extends BaseMigration
             ->addColumn('mime_id', 'integer', [
                 'default' => null,
                 'null' => true,
+                'signed' => false,
             ])
             ->addColumn('url', 'string', [
                 'default' => null,
@@ -68,12 +64,12 @@ class CreateBillAmendments extends BaseMigration
                 'default' => null,
                 'null' => true,
             ])
-            ->addColumn('amendment_size', 'integer', [
+            ->addColumn('supplement_size', 'integer', [
                 'default' => null,
                 'null' => true,
                 'signed' => false,
             ])
-            ->addColumn('amendment_hash', 'string', [
+            ->addColumn('supplement_hash', 'string', [
                 'default' => null,
                 'null' => true,
             ])

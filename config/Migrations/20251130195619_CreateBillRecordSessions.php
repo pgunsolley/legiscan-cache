@@ -2,8 +2,9 @@
 declare(strict_types=1);
 
 use Migrations\BaseMigration;
+use Migrations\Db\Adapter\MysqlAdapter;
 
-class CreateBillVotes extends BaseMigration
+class CreateBillRecordSessions extends BaseMigration
 {
     /**
      * Change Method.
@@ -16,68 +17,63 @@ class CreateBillVotes extends BaseMigration
     public function change(): void
     {
         $this
-            ->table('bill_votes')
-            ->addColumn('bill_id', 'integer', [
+            ->table('bill_record_sessions')
+            ->addColumn('bill_record_id', 'integer', [
                 'default' => null,
                 'null' => false,
             ])
-            ->addColumn('roll_call_id', 'integer', [
+            ->addColumn('session_id', 'integer', [
                 'default' => null,
                 'null' => true,
                 'signed' => false,
             ])
-            ->addColumn('date', 'date', [
-                'default' => null,
-                'null' => true,
-            ])
-            ->addColumn('desc', 'string', [
-                'default' => null,
-                'null' => true,
-            ])
-            ->addColumn('yea', 'integer', [
+            ->addColumn('state_id', 'integer', [
                 'default' => null,
                 'null' => true,
                 'signed' => false,
+                'limit' => MysqlAdapter::INT_TINY,
             ])
-            ->addColumn('nay', 'integer', [
+            ->addColumn('year_start', 'integer', [
+                'default' => null,
+                'null' => true,
+            ])
+            ->addColumn('year_end', 'integer', [
+                'default' => null,
+                'null' => true,
+            ])
+            ->addColumn('prefile', 'integer', [
                 'default' => null,
                 'null' => true,
                 'signed' => false,
+                'limit' => MysqlAdapter::INT_TINY,
             ])
-            ->addColumn('nv', 'integer', [
+            ->addColumn('sine_die', 'integer', [
                 'default' => null,
                 'null' => true,
                 'signed' => false,
+                'limit' => MysqlAdapter::INT_TINY,
             ])
-            ->addColumn('absent', 'integer', [
+            ->addColumn('prior', 'integer', [
                 'default' => null,
                 'null' => true,
                 'signed' => false,
+                'limit' => MysqlAdapter::INT_TINY,
             ])
-            ->addColumn('total', 'integer', [
+            ->addColumn('special', 'integer', [
                 'default' => null,
                 'null' => true,
                 'signed' => false,
+                'limit' => MysqlAdapter::INT_TINY,
             ])
-            ->addColumn('passed', 'integer', [
-                'default' => null,
-                'null' => true,
-                'signed' => false,
-            ])
-            ->addColumn('chamber', 'string', [
+            ->addColumn('session_tag', 'string', [
                 'default' => null,
                 'null' => true,
             ])
-            ->addColumn('chamber_id', 'integer', [
-                'default' => null,
-                'null' => true,
-                'signed' => false,
-            ])
-            ->addColumn('url', 'string', [
+            ->addColumn('session_title', 'string', [
                 'default' => null,
                 'null' => true,
             ])
-            ->addColumn('state_link', 'string', [
+            ->addColumn('session_name', 'string', [
                 'default' => null,
                 'null' => true,
             ])

@@ -2,8 +2,9 @@
 declare(strict_types=1);
 
 use Migrations\BaseMigration;
+use Migrations\Db\Adapter\MysqlAdapter;
 
-class CreateBillSasts extends BaseMigration
+class CreateBillRecordHistories extends BaseMigration
 {
     /**
      * Change Method.
@@ -16,28 +17,33 @@ class CreateBillSasts extends BaseMigration
     public function change(): void
     {
         $this
-            ->table('bill_sasts')
-            ->addColumn('bill_id', 'integer', [
+            ->table('bill_record_histories')
+            ->addColumn('bill_record_id', 'integer', [
                 'default' => null,
                 'null' => false,
             ])
-            ->addColumn('type_id', 'integer', [
+            ->addColumn('date', 'date', [
+                'default' => null,
+                'null' => true,
+            ])
+            ->addColumn('action', 'string', [
+                'default' => null,
+                'null' => true,
+            ])
+            ->addColumn('chamber', 'string', [
+                'default' => null,
+                'null' => true,
+            ])
+            ->addColumn('chamber_id', 'integer', [
                 'default' => null,
                 'null' => true,
                 'signed' => false,
             ])
-            ->addColumn('type', 'string', [
-                'default' => null,
-                'null' => true,
-            ])
-            ->addColumn('sast_bill_number', 'string', [
-                'default' => null,
-                'null' => true,
-            ])
-            ->addColumn('sast_bill_id', 'integer', [
+            ->addColumn('importance', 'integer', [
                 'default' => null,
                 'null' => true,
                 'signed' => false,
+                'limit' => MysqlAdapter::INT_TINY,
             ])
             ->addColumn('created', 'datetime')
             ->addColumn('modified', 'datetime')
