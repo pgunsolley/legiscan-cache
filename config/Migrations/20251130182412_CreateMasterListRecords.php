@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 use Migrations\BaseMigration;
+use Migrations\Db\Adapter\MysqlAdapter;
 
 class CreateMasterListRecords extends BaseMigration
 {
@@ -15,7 +16,53 @@ class CreateMasterListRecords extends BaseMigration
      */
     public function change(): void
     {
-        $table = $this->table('master_list_records');
-        $table->create();
+        $this
+            ->table('master_list_records')
+            ->addColumn('bill_id', 'integer', [
+                'default' => null,
+                'null' => true,
+                'signed' => false,
+            ])
+            ->addColumn('number', 'string', [
+                'default' => null,
+                'null' => true,
+            ])
+            ->addColumn('change_hash', 'string', [
+                'default' => null,
+                'null' => true,
+            ])
+            ->addColumn('url', 'string', [
+                'default' => null,
+                'null' => true,
+            ])
+            ->addColumn('status_date', 'date', [
+                'default' => null,
+                'null' => true,
+            ])
+            ->addColumn('status', 'integer', [
+                'default' => null,
+                'null' => true,
+                'signed' => false,
+                'limit' => MysqlAdapter::INT_TINY,
+            ])
+            ->addColumn('last_action_date', 'date', [
+                'default' => null,
+                'null' => true,
+            ])
+            ->addColumn('last_action', 'string', [
+                'default' => null,
+                'null' => true,
+            ])
+            ->addColumn('title', 'string', [
+                'default' => null,
+                'null' => true,
+            ])
+            ->addColumn('description', 'string', [
+                'default' => null,
+                'null' => true,
+            ])
+            ->addColumn('created', 'datetime')
+            ->addColumn('modified', 'datetime')
+            ->create();
     }
 }
