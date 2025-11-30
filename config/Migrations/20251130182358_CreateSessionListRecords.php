@@ -20,71 +20,71 @@ class CreateSessionListRecords extends BaseMigration
             ->table('session_list_records')
             ->addColumn('session_id', 'integer', [
                 'default' => null,
-                'null' => false,
+                'null' => true,
                 'signed' => false,
             ])
             ->addColumn('state_id', 'integer', [
                 'default' => null,
-                'null' => false,
+                'null' => true,
                 'signed' => false,
                 'limit' => MysqlAdapter::INT_TINY,
             ])
             ->addColumn('state_abbr', 'string', [
                 'default' => null,
-                'null' => false,
+                'null' => true,
                 'limit' => 2,
             ])
             ->addColumn('year_start', 'date', [
                 'default' => null,
-                'null' => false,
+                'null' => true,
             ])
             ->addColumn('year_end', 'date', [
                 'default' => null,
-                'null' => false,
+                'null' => true,
             ])
             ->addColumn('prefile', 'integer', [
                 'default' => null,
-                'null' => false,
+                'null' => true,
                 'limit' => MysqlAdapter::INT_TINY,
             ])
             ->addColumn('sine_die', 'integer', [
                 'default' => null,
-                'null' => false,
+                'null' => true,
                 'limit' => MysqlAdapter::INT_TINY,
             ])
             ->addColumn('prior', 'integer', [
                 'default' => null,
-                'null' => false,
+                'null' => true,
                 'limit' => MysqlAdapter::INT_TINY,
             ])
             ->addColumn('special', 'integer', [
                 'default' => null,
-                'null' => false,
+                'null' => true,
                 'limit' => MysqlAdapter::INT_TINY,
             ])
             ->addColumn('session_tag', 'string', [
                 'default' => null,
-                'null' => false,
+                'null' => true,
             ])
             ->addColumn('session_title', 'string', [
                 'default' => null,
-                'null' => false,
+                'null' => true,
             ])
             ->addColumn('session_name', 'string', [
                 'default' => null,
-                'null' => false,
+                'null' => true,
             ])
             ->addColumn('dataset_hash', 'string', [
                 'default' => null,
-                'null' => false,
+                'null' => true,
             ])
             ->addColumn('session_hash', 'string', [
                 'default' => null,
-                'null' => false,
+                'null' => true,
             ])
             ->addColumn('name', 'string', [
                 'default' => null,
-                'null' => false,
+                'null' => true,
             ])
             ->addColumn('created', 'datetime')
             ->addColumn('modified', 'datetime')
