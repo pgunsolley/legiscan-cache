@@ -1,0 +1,155 @@
+<?php
+declare(strict_types=1);
+
+namespace App\Model\Table;
+
+use Cake\ORM\Query\SelectQuery;
+use Cake\ORM\RulesChecker;
+use Cake\ORM\Table;
+use Cake\Validation\Validator;
+
+/**
+ * SupplementRecords Model
+ *
+ * @method \App\Model\Entity\SupplementRecord newEmptyEntity()
+ * @method \App\Model\Entity\SupplementRecord newEntity(array $data, array $options = [])
+ * @method array<\App\Model\Entity\SupplementRecord> newEntities(array $data, array $options = [])
+ * @method \App\Model\Entity\SupplementRecord get(mixed $primaryKey, array|string $finder = 'all', \Psr\SimpleCache\CacheInterface|string|null $cache = null, \Closure|string|null $cacheKey = null, mixed ...$args)
+ * @method \App\Model\Entity\SupplementRecord findOrCreate($search, ?callable $callback = null, array $options = [])
+ * @method \App\Model\Entity\SupplementRecord patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])
+ * @method array<\App\Model\Entity\SupplementRecord> patchEntities(iterable $entities, array $data, array $options = [])
+ * @method \App\Model\Entity\SupplementRecord|false save(\Cake\Datasource\EntityInterface $entity, array $options = [])
+ * @method \App\Model\Entity\SupplementRecord saveOrFail(\Cake\Datasource\EntityInterface $entity, array $options = [])
+ * @method iterable<\App\Model\Entity\SupplementRecord>|\Cake\Datasource\ResultSetInterface<\App\Model\Entity\SupplementRecord>|false saveMany(iterable $entities, array $options = [])
+ * @method iterable<\App\Model\Entity\SupplementRecord>|\Cake\Datasource\ResultSetInterface<\App\Model\Entity\SupplementRecord> saveManyOrFail(iterable $entities, array $options = [])
+ * @method iterable<\App\Model\Entity\SupplementRecord>|\Cake\Datasource\ResultSetInterface<\App\Model\Entity\SupplementRecord>|false deleteMany(iterable $entities, array $options = [])
+ * @method iterable<\App\Model\Entity\SupplementRecord>|\Cake\Datasource\ResultSetInterface<\App\Model\Entity\SupplementRecord> deleteManyOrFail(iterable $entities, array $options = [])
+ *
+ * @mixin \Cake\ORM\Behavior\TimestampBehavior
+ */
+class SupplementRecordsTable extends Table
+{
+    /**
+     * Initialize method
+     *
+     * @param array<string, mixed> $config The configuration for the Table.
+     * @return void
+     */
+    public function initialize(array $config): void
+    {
+        parent::initialize($config);
+
+        $this->setTable('supplement_records');
+        $this->setDisplayField('title');
+        $this->setPrimaryKey('id');
+
+        $this->addBehavior('Timestamp');
+    }
+
+    /**
+     * Default validation rules.
+     *
+     * @param \Cake\Validation\Validator $validator Validator instance.
+     * @return \Cake\Validation\Validator
+     */
+    public function validationDefault(Validator $validator): Validator
+    {
+        $validator
+            ->nonNegativeInteger('supplement_id')
+            ->allowEmptyString('supplement_id');
+
+        $validator
+            ->nonNegativeInteger('bill_id')
+            ->allowEmptyString('bill_id');
+
+        $validator
+            ->date('date')
+            ->allowEmptyDate('date');
+
+        $validator
+            ->nonNegativeInteger('type_id')
+            ->allowEmptyString('type_id');
+
+        $validator
+            ->scalar('type')
+            ->maxLength('type', 255)
+            ->allowEmptyString('type');
+
+        $validator
+            ->scalar('title')
+            ->maxLength('title', 255)
+            ->allowEmptyString('title');
+
+        $validator
+            ->scalar('description')
+            ->maxLength('description', 255)
+            ->allowEmptyString('description');
+
+        $validator
+            ->scalar('mime')
+            ->maxLength('mime', 255)
+            ->allowEmptyString('mime');
+
+        $validator
+            ->nonNegativeInteger('mime_id')
+            ->allowEmptyString('mime_id');
+
+        $validator
+            ->scalar('url')
+            ->maxLength('url', 255)
+            ->allowEmptyString('url');
+
+        $validator
+            ->scalar('state_link')
+            ->maxLength('state_link', 255)
+            ->allowEmptyString('state_link');
+
+        $validator
+            ->nonNegativeInteger('supplement_size')
+            ->allowEmptyString('supplement_size');
+
+        $validator
+            ->scalar('supplement_hash')
+            ->maxLength('supplement_hash', 255)
+            ->allowEmptyString('supplement_hash');
+
+        $validator
+            ->scalar('doc')
+            ->maxLength('doc', 16777215)
+            ->allowEmptyString('doc');
+
+        $validator
+            ->nonNegativeInteger('alt_supplement')
+            ->allowEmptyString('alt_supplement');
+
+        $validator
+            ->scalar('alt_mime')
+            ->maxLength('alt_mime', 255)
+            ->allowEmptyString('alt_mime');
+
+        $validator
+            ->nonNegativeInteger('alt_mime_id')
+            ->allowEmptyString('alt_mime_id');
+
+        $validator
+            ->scalar('alt_state_link')
+            ->maxLength('alt_state_link', 255)
+            ->allowEmptyString('alt_state_link');
+
+        $validator
+            ->nonNegativeInteger('alt_supplement_size')
+            ->allowEmptyString('alt_supplement_size');
+
+        $validator
+            ->scalar('alt_supplement_hash')
+            ->maxLength('alt_supplement_hash', 255)
+            ->allowEmptyString('alt_supplement_hash');
+
+        $validator
+            ->scalar('alt_doc')
+            ->maxLength('alt_doc', 16777215)
+            ->allowEmptyString('alt_doc');
+
+        return $validator;
+    }
+}
