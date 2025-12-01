@@ -21,6 +21,7 @@ class SupplementRecordsController extends AppController
         $supplementRecords = $this->paginate($query);
 
         $this->set(compact('supplementRecords'));
+        $this->viewBuilder()->setOption('serialize', ['supplementRecords']);
     }
 
     /**
@@ -34,67 +35,6 @@ class SupplementRecordsController extends AppController
     {
         $supplementRecord = $this->SupplementRecords->get($id, contain: []);
         $this->set(compact('supplementRecord'));
-    }
-
-    /**
-     * Add method
-     *
-     * @return \Cake\Http\Response|null|void Redirects on successful add, renders view otherwise.
-     */
-    public function add()
-    {
-        $supplementRecord = $this->SupplementRecords->newEmptyEntity();
-        if ($this->request->is('post')) {
-            $supplementRecord = $this->SupplementRecords->patchEntity($supplementRecord, $this->request->getData());
-            if ($this->SupplementRecords->save($supplementRecord)) {
-                $this->Flash->success(__('The supplement record has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('The supplement record could not be saved. Please, try again.'));
-        }
-        $this->set(compact('supplementRecord'));
-    }
-
-    /**
-     * Edit method
-     *
-     * @param string|null $id Supplement Record id.
-     * @return \Cake\Http\Response|null|void Redirects on successful edit, renders view otherwise.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function edit($id = null)
-    {
-        $supplementRecord = $this->SupplementRecords->get($id, contain: []);
-        if ($this->request->is(['patch', 'post', 'put'])) {
-            $supplementRecord = $this->SupplementRecords->patchEntity($supplementRecord, $this->request->getData());
-            if ($this->SupplementRecords->save($supplementRecord)) {
-                $this->Flash->success(__('The supplement record has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('The supplement record could not be saved. Please, try again.'));
-        }
-        $this->set(compact('supplementRecord'));
-    }
-
-    /**
-     * Delete method
-     *
-     * @param string|null $id Supplement Record id.
-     * @return \Cake\Http\Response|null Redirects to index.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function delete($id = null)
-    {
-        $this->request->allowMethod(['post', 'delete']);
-        $supplementRecord = $this->SupplementRecords->get($id);
-        if ($this->SupplementRecords->delete($supplementRecord)) {
-            $this->Flash->success(__('The supplement record has been deleted.'));
-        } else {
-            $this->Flash->error(__('The supplement record could not be deleted. Please, try again.'));
-        }
-
-        return $this->redirect(['action' => 'index']);
+        $this->viewBuilder()->setOption('serialize', ['supplementRecord']);
     }
 }
