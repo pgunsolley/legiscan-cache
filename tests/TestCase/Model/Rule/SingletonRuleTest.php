@@ -6,6 +6,7 @@ namespace App\Test\TestCase\Model\Rule;
 
 use App\Model\Rule\SingletonRule;
 use Cake\ORM\Entity;
+use Cake\ORM\Exception\MissingEntityException;
 use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\Table;
 use Exception;
@@ -76,5 +77,52 @@ class SingletonRuleTest extends TestCase
 
         $result = $rule($mockEntity, $options);
         $this->assertTrue($result);
+    }
+
+    public function test__invoke_throws_missingRequiredFieldOnEntity(): void
+    {
+        $rule = new SingletonRule(fields: ['foo', 'bar', 'baz']);
+        $mockEntity = $this->createMock(Entity::class);
+        $mockSelectQuery = $this->createMock(SelectQuery::class);
+        $mockTable = $this->createMock(Table::class);
+
+        $mockEntity
+            ->expects($this->exactly(3))
+            ->method('has')
+            ->willReturnCallback(fn($arg) => match ($arg) {
+                'foo',
+                'bar' => true,
+                'baz' => false, // Entity does not have 'baz' field set
+                default => throw new Exception("Unexpected property $arg"),
+            });
+
+        $mockEntity
+            ->expects($this->never())
+            ->method('toArray');
+
+        $mockEntity
+            ->expects($this->never())
+            ->method('get');
+
+        $mockSelectQuery
+            ->expects($this->never())
+            ->method('where');
+
+        $mockSelectQuery
+            ->expects($this->never())
+            ->method('count');
+
+        $mockTable
+            ->expects($this->never())
+            ->method('find');
+
+        $options = [
+            'errorField' => 'foo',
+            'message' => 'error-message',
+            'repository' => $mockTable,
+        ];
+
+        $this->expectException(MissingEntityException::class);
+        $rule($mockEntity, $options);
     }
 }
