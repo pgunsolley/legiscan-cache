@@ -79,6 +79,71 @@ class SingletonRuleTest extends TestCase
         $this->assertTrue($result);
     }
 
+    public function test__invoke_fail_validFieldsAndExistingEntity(): void
+    {
+        $rule = new SingletonRule(fields: ['foo', 'bar']);
+        $mockEntity = $this->createMock(Entity::class);
+        $mockSelectQuery = $this->createMock(SelectQuery::class);
+        $mockTable = $this->createMock(Table::class);
+
+        $mockEntity
+            ->expects($this->exactly(2))
+            ->method('has')
+            ->willReturnCallback(fn($arg) => match ($arg) {
+                'foo',
+                'bar' => true,
+                default => throw new Exception("Unexpected property $arg"),
+            });
+
+        $mockEntity
+            ->expects($this->once())
+            ->method('toArray')
+            ->with()
+            ->willReturn([
+                'foo' => 'FOO',
+                'bar' => 'BAR',
+            ]);
+
+        $mockEntity
+            ->expects($this->exactly(2))
+            ->method('get')
+            ->willReturnCallback(fn($arg) => match ($arg) {
+                'foo' => 'FOO',
+                'bar' => 'BAR',
+                default => throw new Exception("Unexpected property $arg"),
+            });
+
+        $mockSelectQuery
+            ->expects($this->once())
+            ->method('where')
+            ->with([
+                'foo' => 'FOO',
+                'bar' => 'BAR',
+            ])
+            ->willReturnSelf();
+
+        $mockSelectQuery
+            ->expects($this->once())
+            ->method('count')
+            ->with()
+            ->willReturn(1);
+
+        $mockTable
+            ->expects($this->once())
+            ->method('find')
+            ->with()
+            ->willReturn($mockSelectQuery);
+
+        $options = [
+            'errorField' => 'foo',
+            'message' => 'error-message',
+            'repository' => $mockTable,
+        ];
+
+        $result = $rule($mockEntity, $options);
+        $this->assertFalse($result);
+    }
+
     public function test__invoke_throws_missingRequiredFieldOnEntity(): void
     {
         $rule = new SingletonRule(fields: ['foo', 'bar', 'baz']);
