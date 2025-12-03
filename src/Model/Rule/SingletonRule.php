@@ -7,6 +7,7 @@ namespace App\Model\Rule;
 use Cake\Datasource\EntityInterface;
 use Cake\ORM\Exception\MissingEntityException;
 
+// Use this rule to add additional checks to ensure uniqueness that cannot be satisfied with cakephp built-in isUnique rule.
 class SingletonRule
 {
     protected array $fields;
