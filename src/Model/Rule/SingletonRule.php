@@ -32,7 +32,7 @@ class SingletonRule
                 array_combine(
                     $this->fields,
                     array_map(
-                        fn($key) => $entity[$key],
+                        fn($key) => $entity->get($key),
                         array_keys($entity->toArray()),
                     ),
                 ),

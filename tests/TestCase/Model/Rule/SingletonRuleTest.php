@@ -4,9 +4,77 @@ declare(strict_types=1);
 
 namespace App\Test\TestCase\Model\Rule;
 
+use App\Model\Rule\SingletonRule;
+use Cake\ORM\Entity;
+use Cake\ORM\Query\SelectQuery;
+use Cake\ORM\Table;
+use Exception;
 use PHPUnit\Framework\TestCase;
 
 class SingletonRuleTest extends TestCase
 {
-    
+    public function test__invoke_pass_validFieldsAndNoExistingEntity(): void
+    {
+        $rule = new SingletonRule(fields: ['foo', 'bar']);
+        $mockEntity = $this->createMock(Entity::class);
+        $mockSelectQuery = $this->createMock(SelectQuery::class);
+        $mockTable = $this->createMock(Table::class);
+
+        $mockEntity
+            ->expects($this->exactly(2))
+            ->method('has')
+            ->willReturnCallback(fn($arg) => match ($arg) {
+                'foo',
+                'bar' => true,
+                default => throw new Exception("Unexpected property $arg"),
+            });
+
+        $mockEntity
+            ->expects($this->once())
+            ->method('toArray')
+            ->with()
+            ->willReturn([
+                'foo' => 'FOO',
+                'bar' => 'BAR',
+            ]);
+
+        $mockEntity
+            ->expects($this->exactly(2))
+            ->method('get')
+            ->willReturnCallback(fn($arg) => match ($arg) {
+                'foo' => 'FOO',
+                'bar' => 'BAR',
+                default => throw new Exception("Unexpected property $arg"),
+            });
+
+        $mockSelectQuery
+            ->expects($this->once())
+            ->method('where')
+            ->with([
+                'foo' => 'FOO',
+                'bar' => 'BAR',
+            ])
+            ->willReturnSelf();
+
+        $mockSelectQuery
+            ->expects($this->once())
+            ->method('count')
+            ->with()
+            ->willReturn(0);
+
+        $mockTable
+            ->expects($this->once())
+            ->method('find')
+            ->with()
+            ->willReturn($mockSelectQuery);
+
+        $options = [
+            'errorField' => 'foo',
+            'message' => 'error-message',
+            'repository' => $mockTable,
+        ];
+
+        $result = $rule($mockEntity, $options);
+        $this->assertTrue($result);
+    }
 }
