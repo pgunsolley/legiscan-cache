@@ -152,4 +152,10 @@ class SupplementRecordsTable extends Table
 
         return $validator;
     }
+
+    public function buildRules(RulesChecker $rules): RulesChecker
+    {
+        $rules->add($rules->isUnique(['supplement_id', 'bill_id']));
+        return $rules;
+    }
 }

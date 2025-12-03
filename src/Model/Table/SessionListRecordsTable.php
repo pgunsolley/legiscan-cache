@@ -125,6 +125,7 @@ class SessionListRecordsTable extends Table
 
     public function buildRules(RulesChecker $rules): RulesChecker
     {
-        // TODO: Add SingletonRule
+        $rules->add($rules->isUnique(['session_id', 'state_id']));
+        return $rules;
     }
 }

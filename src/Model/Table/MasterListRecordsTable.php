@@ -102,4 +102,10 @@ class MasterListRecordsTable extends Table
 
         return $validator;
     }
+
+    public function buildRules(RulesChecker $rules): RulesChecker
+    {
+        $rules->add($rules->isUnique(['bill_id']));
+        return $rules;
+    }
 }
