@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Utility\StateAbbreviation;
-use App\Service\DateSync\ResultSetExpirationChecker;
+use App\Service\DateSync\ResultSetExpirationCheckerInterface;
 use Cake\Http\Exception\NotImplementedException;
 use Cake\ORM\Locator\LocatorAwareTrait;
 
@@ -20,11 +20,11 @@ class DataSyncService
         $this->legiscanApiService = $legiscanApiService;
     }
 
-    public function syncSessionList(StateAbbreviation $state, ResultSetExpirationChecker $resultSetExpirationChecker): array
+    public function syncSessionList(StateAbbreviation $state, ResultSetExpirationCheckerInterface $expirationChecker): array
     {
         $sessionListRecordsTable = $this->fetchTable('SessionListRecords');
         $results = $sessionListRecordsTable->find()->where(['state_abbr' => $state->value])->all();
-        if (!$resultSetExpirationChecker->isExpired($results)) {
+        if (!$expirationChecker->isExpired($results)) {
             return [];
         }
 
@@ -33,7 +33,7 @@ class DataSyncService
         
     }
 
-    public function syncMasterList(int $sessionId, ResultSetExpirationChecker $expirationChecker): void
+    public function syncMasterList(int $sessionId, ResultSetExpirationCheckerInterface $expirationChecker): void
     {
         throw new NotImplementedException();
     }
