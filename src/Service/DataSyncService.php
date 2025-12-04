@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Utility\StateAbbreviation;
+use App\Service\DateSync\ResultSetExpirationChecker;
+use Cake\Http\Exception\NotImplementedException;
 use Cake\ORM\Locator\LocatorAwareTrait;
 
 class DataSyncService
@@ -17,10 +20,21 @@ class DataSyncService
         $this->legiscanApiService = $legiscanApiService;
     }
 
-    public function syncSessionList()
+    public function syncSessionList(StateAbbreviation $state, ResultSetExpirationChecker $resultSetExpirationChecker): array
     {
         $sessionListRecordsTable = $this->fetchTable('SessionListRecords');
+        $results = $sessionListRecordsTable->find()->where(['state_abbr' => $state->value])->all();
+        if (!$resultSetExpirationChecker->isExpired($results)) {
+            return [];
+        }
 
-        // TODO: Configure table validation and app rules
+        // TODO: Perform sync. Return array of sync'd session ids
+        $legiscanApiResponseData = $this->legiscanApiService->getSessionList($state->value);
+        
+    }
+
+    public function syncMasterList(int $sessionId, ResultSetExpirationChecker $expirationChecker): void
+    {
+        throw new NotImplementedException();
     }
 }
