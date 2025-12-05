@@ -16,7 +16,7 @@ class AllOrNothingTest extends TestCase
     {
         $entities = array_map(fn($i) => new Entity([
             'id' => $i,
-            'modified' => Date::now()->subDays(2),
+            'last_sync' => Date::now()->subDays(2),
             'foo' => 'FOO',
         ]), range(1, 4));
 
@@ -30,7 +30,7 @@ class AllOrNothingTest extends TestCase
     {
         $entities = array_map(fn($i) => new Entity([
             'id' => $i,
-            'modified' => Date::now(),
+            'last_sync' => Date::now(),
             'foo' => 'FOO',
         ]), range(1, 4));
 
@@ -44,12 +44,12 @@ class AllOrNothingTest extends TestCase
     {
         $entities = array_map(fn($i) => new Entity([
             'id' => $i,
-            'modified' => Date::now(),
+            'last_sync' => Date::now(),
             'foo' => 'FOO',
         ]), range(1, 4));
         $entities[] = new Entity([
             'id' => 5,
-            'modified' => Date::now()->subDays(2),
+            'last_sync' => Date::now()->subDays(2),
             'foo' => 'FOO',
         ]);
 

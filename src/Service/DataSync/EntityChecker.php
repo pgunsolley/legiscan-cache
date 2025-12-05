@@ -14,7 +14,7 @@ class EntityChecker implements EntityCheckerInterface
     use InstanceConfigTrait;
     
     protected array $_defaultConfig = [
-        'field' => 'modified',
+        'field' => 'last_sync',
         'interval' => 'P1D',
     ];
 

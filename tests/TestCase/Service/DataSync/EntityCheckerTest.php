@@ -18,7 +18,7 @@ class EntityCheckerTest extends TestCase
         $mockEntity
             ->expects($this->once())
             ->method('get')
-            ->with('modified')
+            ->with('last_sync')
             ->willReturn(Date::now()->subDays(2));
         $this->assertTrue($checker->isEntityExpired($mockEntity));
     }
@@ -30,7 +30,7 @@ class EntityCheckerTest extends TestCase
         $mockEntity
             ->expects($this->once())
             ->method('get')
-            ->with('modified')
+            ->with('last_sync')
             ->willReturn(Date::now()->subDays(1));
         $this->assertTrue($checker->isEntityExpired($mockEntity));
     }
@@ -44,7 +44,7 @@ class EntityCheckerTest extends TestCase
         $mockEntity
             ->expects($this->once())
             ->method('get')
-            ->with('modified')
+            ->with('last_sync')
             ->willReturn(Date::now()->subDays(5));
         $this->assertFalse($checker->isEntityExpired($mockEntity));
     }
@@ -58,7 +58,7 @@ class EntityCheckerTest extends TestCase
         $mockEntity
             ->expects($this->once())
             ->method('get')
-            ->with('modified')
+            ->with('last_sync')
             ->willReturn(Date::now()->subDays(7));
         $this->assertTrue($checker->isEntityExpired($mockEntity));
     }
@@ -70,13 +70,13 @@ class EntityCheckerTest extends TestCase
         $mockEntity
             ->expects($this->once())
             ->method('get')
-            ->with('modified')
+            ->with('last_sync')
             ->willReturn(Date::now());
         $this->assertFalse($checker->isEntityExpired($mockEntity));
     }
 
     public function testGetField(): void
     {
-        $this->assertEquals('modified', (new EntityChecker())->getField());
+        $this->assertEquals('last_sync', (new EntityChecker())->getField());
     }
 }
