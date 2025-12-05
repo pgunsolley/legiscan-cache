@@ -58,4 +58,12 @@ class AllOrNothingTest extends TestCase
         $result = $checker->isSetExpired($resultSet);
         $this->assertFalse($result);
     }
+
+    public function testIsSetExpired_emptySet(): void
+    {
+        $resultSet = new ResultSet([]);
+        $checker = new AllOrNothing();
+        $result = $checker->isSetExpired($resultSet);
+        $this->assertTrue($result);
+    }
 }

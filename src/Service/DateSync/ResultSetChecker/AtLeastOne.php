@@ -11,6 +11,6 @@ class AtLeastOne extends ResultSetChecker
 {
     public function isSetExpired(ResultSetInterface $entities): bool
     {
-        return $entities->some(fn($entity) => $this->isEntityExpired($entity));
+        return $entities->isEmpty() || $entities->some(fn($entity) => $this->isEntityExpired($entity));
     }
 }

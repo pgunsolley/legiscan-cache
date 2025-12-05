@@ -58,4 +58,12 @@ class AtLeastOneTest extends TestCase
         $result = $checker->isSetExpired($resultSet);
         $this->assertTrue($result);
     }
+
+    public function testIsSetExpired_emptySet(): void
+    {
+        $resultSet = new ResultSet([]);
+        $checker = new AtLeastOne();
+        $result = $checker->isSetExpired($resultSet);
+        $this->assertTrue($result);
+    }
 }
