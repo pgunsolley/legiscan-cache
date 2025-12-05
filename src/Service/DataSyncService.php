@@ -38,6 +38,7 @@ class DataSyncService
 
         $sessionList = $apiResponseBody['sessions'];
 
+        $entitiesToSave = [];
         foreach ($sessionList as $sessionListItem) {
             /** @var \App\Model\Entity\SessionListRecord $entity */
             $entity = $entities->firstMatch([
@@ -46,17 +47,19 @@ class DataSyncService
                 'state_abbr' => $sessionListItem['state_abbr'],
                 'year_start' => $sessionListItem['year_start'],
                 'year_end' => $sessionListItem['year_end'],
-                'session_tag' => $sessionListItem['session_tag'],
-                'session_title' => $sessionListItem['session_title'],
-                'session_name' => $sessionListItem['session_name'],
             ]) ?? $table->newEntity($sessionListItem);
 
-            if (!$entity->isNew()) {
-                $entity->set($checker->getField(), Date::now());
+            if ($entity->isNew()) {
+                $entitiesToSave[] = $entity;
+                continue;
             }
 
-            // TODO: 
+            if ($entity->get('session_hash') !== $sessionListItem['session_hash']) {
+                $entitiesToSave[] = $table->patchEntity($entity, $sessionListItem);
+            }
         }
+
+        return $table->saveManyOrFail($entitiesToSave);
     }
 
     public function syncMasterList(int $sessionId, ResultSetCheckerInterface $checker): void

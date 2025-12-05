@@ -74,4 +74,9 @@ class EntityCheckerTest extends TestCase
             ->willReturn(Date::now());
         $this->assertFalse($checker->isEntityExpired($mockEntity));
     }
+
+    public function testGetField(): void
+    {
+        $this->assertEquals('modified', (new EntityChecker())->getField());
+    }
 }
