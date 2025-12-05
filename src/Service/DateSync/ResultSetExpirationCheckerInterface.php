@@ -6,7 +6,7 @@ namespace App\Service\DateSync;
 
 use Cake\Datasource\ResultSetInterface;
 
-interface ResultSetExpirationCheckerInterface
+interface ResultSetExpirationCheckerInterface extends EntityExpirationCheckerInterface
 {
     public function isSetExpired(ResultSetInterface $entities): bool;
 }
