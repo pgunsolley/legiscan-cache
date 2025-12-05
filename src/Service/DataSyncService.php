@@ -22,15 +22,7 @@ class DataSyncService
 
     public function syncSessionList(StateAbbreviation $state, ResultSetExpirationCheckerInterface $expirationChecker): array
     {
-        $sessionListRecordsTable = $this->fetchTable('SessionListRecords');
-        $results = $sessionListRecordsTable->find()->where(['state_abbr' => $state->value])->all();
-        if (!$expirationChecker->isSetExpired($results)) {
-            return [];
-        }
-
-        // TODO: Perform sync. Return array of sync'd session ids
-        $legiscanApiResponseData = $this->legiscanApiService->getSessionList($state->value);
-        
+        throw new NotImplementedException();
     }
 
     public function syncMasterList(int $sessionId, ResultSetExpirationCheckerInterface $expirationChecker): void

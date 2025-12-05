@@ -13,7 +13,7 @@ class EntityExpirationChecker implements EntityExpirationCheckerInterface
 {
     use InstanceConfigTrait;
     
-    protected array $_defaultConfiguration = [
+    protected array $_defaultConfig = [
         'field' => 'modified',
         'interval' => 'P1D',
     ];
