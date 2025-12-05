@@ -4,7 +4,7 @@ namespace App\Service\DateSync;
 
 use Cake\Datasource\EntityInterface;
 
-interface EntityExpirationCheckerInterface
+interface EntityCheckerInterface
 {
     public function isEntityExpired(EntityInterface $entity): bool;
 }

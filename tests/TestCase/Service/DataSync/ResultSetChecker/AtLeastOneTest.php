@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Test\TestCase\Service\DataSync\ResultSetExpirationChecker;
+namespace App\Test\TestCase\Service\DataSync\ResultSetChecker;
 
-use App\Service\DateSync\ResultSetExpirationChecker\AtLeastOne;
+use App\Service\DateSync\ResultSetChecker\AtLeastOne;
 use Cake\I18n\Date;
 use Cake\ORM\Entity;
 use Cake\ORM\ResultSet;

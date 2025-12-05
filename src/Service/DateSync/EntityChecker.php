@@ -9,7 +9,7 @@ use Cake\Datasource\EntityInterface;
 use Cake\I18n\Date;
 use DateInterval;
 
-class EntityExpirationChecker implements EntityExpirationCheckerInterface
+class EntityChecker implements EntityCheckerInterface
 {
     use InstanceConfigTrait;
     
