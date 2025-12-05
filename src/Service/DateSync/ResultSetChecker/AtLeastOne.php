@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace App\Service\DateSync\ResultSetChecker;
 
-use App\Service\DateSync\EntityChecker;
-use App\Service\DateSync\ResultSetCheckerInterface;
+use App\Service\DateSync\ResultSetChecker;
 use Cake\Datasource\ResultSetInterface;
 
-class AtLeastOne extends EntityChecker implements ResultSetCheckerInterface
+class AtLeastOne extends ResultSetChecker
 {
     public function isSetExpired(ResultSetInterface $entities): bool
     {
