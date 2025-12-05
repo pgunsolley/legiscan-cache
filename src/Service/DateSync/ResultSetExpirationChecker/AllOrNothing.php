@@ -10,7 +10,7 @@ use Cake\Datasource\ResultSetInterface;
 
 class AllOrNothing extends EntityExpirationChecker implements ResultSetExpirationCheckerInterface
 {
-    public function isExpired(ResultSetInterface $entities): bool
+    public function isSetExpired(ResultSetInterface $entities): bool
     {
         return $entities->every(fn($entity) => $this->isEntityExpired($entity));
     }

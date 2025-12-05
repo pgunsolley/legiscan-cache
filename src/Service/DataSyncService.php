@@ -24,7 +24,7 @@ class DataSyncService
     {
         $sessionListRecordsTable = $this->fetchTable('SessionListRecords');
         $results = $sessionListRecordsTable->find()->where(['state_abbr' => $state->value])->all();
-        if (!$expirationChecker->isExpired($results)) {
+        if (!$expirationChecker->isSetExpired($results)) {
             return [];
         }
 

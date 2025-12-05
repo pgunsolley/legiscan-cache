@@ -10,7 +10,7 @@ use Cake\Datasource\ResultSetInterface;
 
 class AtLeastOne extends EntityExpirationChecker implements ResultSetExpirationCheckerInterface
 {
-    public function isExpired(ResultSetInterface $entities): bool
+    public function isSetExpired(ResultSetInterface $entities): bool
     {
         return $entities->some(fn($entity) => $this->isEntityExpired($entity));
     }
