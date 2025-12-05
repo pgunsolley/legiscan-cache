@@ -122,6 +122,11 @@ class SessionListRecordsTable extends Table
             ->maxLength('name', 255)
             ->allowEmptyString('name');
 
+        $validator
+            ->date('last_sync')
+            ->requirePresence('last_sync', true)
+            ->notEmptyDate('last_sync');
+
         return $validator;
     }
 

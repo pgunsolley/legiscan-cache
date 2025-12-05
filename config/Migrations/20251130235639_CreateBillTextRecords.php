@@ -102,6 +102,10 @@ class CreateBillTextRecords extends BaseMigration
             ])
             ->addColumn('created', 'datetime')
             ->addColumn('modified', 'datetime')
+            ->addColumn('last_sync', 'date', [
+                'default' => null,
+                'null' => false,
+            ])
             ->create();
     }
 }

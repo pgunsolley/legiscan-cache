@@ -33,6 +33,7 @@ use Cake\ORM\Entity;
  * @property string|null $alt_doc
  * @property \Cake\I18n\DateTime $created
  * @property \Cake\I18n\DateTime $modified
+ * @property \Cake\I18n\Date $last_sync
  */
 class AmendmentRecord extends Entity
 {
@@ -70,5 +71,6 @@ class AmendmentRecord extends Entity
         'alt_doc' => true,
         'created' => true,
         'modified' => true,
+        'last_sync' => true,
     ];
 }

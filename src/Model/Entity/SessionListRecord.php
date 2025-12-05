@@ -26,6 +26,7 @@ use Cake\ORM\Entity;
  * @property string|null $name
  * @property \Cake\I18n\DateTime $created
  * @property \Cake\I18n\DateTime $modified
+ * @property \Cake\I18n\Date $last_sync
  */
 class SessionListRecord extends Entity
 {
@@ -56,5 +57,6 @@ class SessionListRecord extends Entity
         'name' => true,
         'created' => true,
         'modified' => true,
+        'last_sync' => true,
     ];
 }

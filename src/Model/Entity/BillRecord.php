@@ -31,6 +31,7 @@ use Cake\ORM\Entity;
  * @property int|null $pending_committee_id
  * @property \Cake\I18n\DateTime $created
  * @property \Cake\I18n\DateTime $modified
+ * @property \Cake\I18n\Date $last_sync
  *
  * @property \App\Model\Entity\BillRecordAmendment[] $bill_record_amendments
  * @property \App\Model\Entity\BillRecordCalendar[] $bill_record_calendars
@@ -80,6 +81,7 @@ class BillRecord extends Entity
         'pending_committee_id' => true,
         'created' => true,
         'modified' => true,
+        'last_sync' => true,
         'bill_record_amendments' => true,
         'bill_record_calendars' => true,
         'bill_record_committees' => true,

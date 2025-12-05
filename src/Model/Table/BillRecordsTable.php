@@ -198,6 +198,11 @@ class BillRecordsTable extends Table
             ->nonNegativeInteger('pending_committee_id')
             ->allowEmptyString('pending_committee_id');
 
+        $validator
+            ->date('last_sync')
+            ->requirePresence('last_sync', true)
+            ->notEmptyDate('last_sync');
+
         return $validator;
     }
 

@@ -21,6 +21,7 @@ use Cake\ORM\Entity;
  * @property string|null $description
  * @property \Cake\I18n\DateTime $created
  * @property \Cake\I18n\DateTime $modified
+ * @property \Cake\I18n\Date $last_sync
  */
 class MasterListRecord extends Entity
 {
@@ -46,5 +47,6 @@ class MasterListRecord extends Entity
         'description' => true,
         'created' => true,
         'modified' => true,
+        'last_sync' => true,
     ];
 }
