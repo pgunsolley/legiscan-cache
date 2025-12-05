@@ -22,11 +22,14 @@ class DataSyncService
         $this->legiscanApiService = $legiscanApiService;
     }
 
-    public function syncSessionList(StateAbbreviation $state, ResultSetCheckerInterface $checker): array
+    public function syncSessionList(StateAbbreviation $state, ResultSetCheckerInterface $checker, string $finder = 'byStateAbbreviation', ?array $finderOptions = null): array
     {
         $table = $this->fetchTable('SessionListRecords');
-        $entities = $table->find('byStateAbbreviation', stateAbbreviation: $state)->all();
+        if (is_null($finderOptions)) {
+            $finderOptions = ['stateAbbreviation' => $state];
+        }
 
+        $entities = $table->find($finder, ...$finderOptions)->all();
         if (!$checker->isSetExpired($entities)) {
             return [];
         }
@@ -37,7 +40,7 @@ class DataSyncService
         }
 
         $sessionList = $apiResponseBody['sessions'];
-
+        $syncDate = Date::now();
         $entitiesToSave = [];
         foreach ($sessionList as $sessionListItem) {
             /** @var \App\Model\Entity\SessionListRecord $entity */
@@ -49,14 +52,17 @@ class DataSyncService
                 'year_end' => $sessionListItem['year_end'],
             ]) ?? $table->newEntity($sessionListItem);
 
+            $entity->set('last_sync', $syncDate);
             if ($entity->isNew()) {
                 $entitiesToSave[] = $entity;
                 continue;
             }
 
             if ($entity->get('session_hash') !== $sessionListItem['session_hash']) {
-                $entitiesToSave[] = $table->patchEntity($entity, $sessionListItem);
+                $table->patchEntity($entity, $sessionListItem);
             }
+
+            $entitiesToSave[] = $entity;
         }
 
         return $table->saveManyOrFail($entitiesToSave);
