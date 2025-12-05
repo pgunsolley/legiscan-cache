@@ -1,10 +1,12 @@
 <?php
 
-namespace App\Service\DateSync;
+namespace App\Service\DataSync;
 
 use Cake\Datasource\EntityInterface;
 
 interface EntityCheckerInterface
 {
+    public function getField(): string;
+
     public function isEntityExpired(EntityInterface $entity): bool;
 }

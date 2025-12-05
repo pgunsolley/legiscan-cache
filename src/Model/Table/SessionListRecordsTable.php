@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\Model\Table;
 
+use App\Utility\StateAbbreviation;
+use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
@@ -127,5 +129,10 @@ class SessionListRecordsTable extends Table
     {
         $rules->add($rules->isUnique(['session_id', 'state_id']));
         return $rules;
+    }
+
+    public function findByStateAbbreviation(SelectQuery $query, StateAbbreviation $stateAbbreviation): SelectQuery
+    {
+        return $query->where(['state_abbr' => $stateAbbreviation->value]);
     }
 }

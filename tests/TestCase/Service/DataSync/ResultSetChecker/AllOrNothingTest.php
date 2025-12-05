@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Test\TestCase\Service\DataSync\ResultSetChecker;
 
-use App\Service\DateSync\ResultSetChecker\AllOrNothing;
+use App\Service\DataSync\ResultSetChecker\AllOrNothing;
 use Cake\I18n\Date;
 use Cake\ORM\Entity;
 use Cake\ORM\ResultSet;

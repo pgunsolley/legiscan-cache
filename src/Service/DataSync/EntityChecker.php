@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Service\DateSync;
+namespace App\Service\DataSync;
 
 use Cake\Core\InstanceConfigTrait;
 use Cake\Datasource\EntityInterface;
@@ -21,6 +21,11 @@ class EntityChecker implements EntityCheckerInterface
     public function __construct(array $config = [])
     {
         $this->setConfig($config);
+    }
+
+    public function getField(): string
+    {
+        return $this->getConfig('field');
     }
 
     public function isEntityExpired(EntityInterface $entity): bool

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Service\DateSync\ResultSetChecker;
+namespace App\Service\DataSync\ResultSetChecker;
 
-use App\Service\DateSync\ResultSetChecker;
+use App\Service\DataSync\ResultSetChecker;
 use Cake\Datasource\ResultSetInterface;
 
 class AllOrNothing extends ResultSetChecker

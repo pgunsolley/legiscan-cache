@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Test\TestCase\Service\DataSync;
 
-use App\Service\DateSync\EntityChecker;
+use App\Service\DataSync\EntityChecker;
 use Cake\I18n\Date;
 use Cake\ORM\Entity;
 use PHPUnit\Framework\TestCase;
