@@ -106,5 +106,7 @@ class DataSyncService
 
             $entitiesToSave[] = $entity;
         }
+
+        return $table->saveManyOrFail($entitiesToSave);
     }
 }
