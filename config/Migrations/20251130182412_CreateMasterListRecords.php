@@ -18,6 +18,11 @@ class CreateMasterListRecords extends BaseMigration
     {
         $this
             ->table('master_list_records')
+            ->addColumn('session_id', 'integer', [
+                'default' => null,
+                'null' => false,
+                'signed' => false,
+            ])
             ->addColumn('bill_id', 'integer', [
                 'default' => null,
                 'null' => true,

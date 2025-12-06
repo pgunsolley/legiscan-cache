@@ -7,7 +7,6 @@ namespace App\Service;
 use App\Service\DataSync\Exception\InvalidResponseBodyException;
 use App\Service\DataSync\ResultSetCheckerInterface;
 use App\Utility\StateAbbreviation;
-use Cake\Http\Exception\NotImplementedException;
 use Cake\I18n\Date;
 use Cake\ORM\Locator\LocatorAwareTrait;
 
@@ -68,8 +67,44 @@ class DataSyncService
         return $table->saveManyOrFail($entitiesToSave);
     }
 
-    public function syncMasterList(int $sessionId, ResultSetCheckerInterface $checker): void
+    public function syncMasterList(int $sessionId, ResultSetCheckerInterface $checker, string $finder = 'bySessionId', ?array $finderOptions = null): array
     {
-        throw new NotImplementedException();
+        $table = $this->fetchTable('MasterListRecords');
+        if (is_null($finderOptions)) {
+            $finderOptions = ['sessionId' => $sessionId];
+        }
+
+        $entities = $table->find($finder, ...$finderOptions)->all();
+        if (!$checker->isSetExpired($entities)) {
+            return [];
+        }
+
+        $apiResponseBody = $this->legiscanApiService->getMasterList($sessionId);
+        if (!array_key_exists('masterlist', $apiResponseBody)) {
+            throw new InvalidResponseBodyException("getMasterList response body missing key 'masterlist'");
+        }
+
+        $masterList = $apiResponseBody['masterlist'];
+        $syncDate = Date::now();
+        $entitiesToSave = [];
+        foreach ($masterList as $masterListItem) {
+            /** @var \App\Model\Entity\MasterListRecord $entity */
+            $entity = $entities->firstMatch([
+                'bill_id' => $masterListItem['bill_id'],
+                'number' => $masterListItem['number'],
+            ]) ?? $table->newEntity($masterListItem);
+
+            $entity->set('last_sync', $syncDate);
+            if ($entity->isNew()) {
+                $entitiesToSave[] = $entity;
+                continue;
+            }
+
+            if ($entity->get('change_hash') !== $masterListItem['change_hash']) {
+                $table->patchEntity($entity, $masterListItem);
+            }
+
+            $entitiesToSave[] = $entity;
+        }
     }
 }
