@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Service\DataSync\EntityCheckerInterface;
 use App\Service\DataSync\Exception\InvalidResponseBodyException;
 use App\Service\DataSync\ResultSetCheckerInterface;
 use App\Utility\StateAbbreviation;
 use Cake\I18n\Date;
 use Cake\ORM\Locator\LocatorAwareTrait;
+use TypeError;
 
 class DataSyncService
 {
@@ -100,5 +102,51 @@ class DataSyncService
         }
 
         return $table->saveManyOrFail($entitiesToSave);
+    }
+
+    public function syncBill(int $billId, EntityCheckerInterface $checker)
+    {
+        $table = $this->fetchTable('BillRecords');
+        $entity = $table
+            ->find('byBillId', billId: $billId)
+            ->contain([
+                'BillRecordAmendments',
+                'BillRecordCalendars',
+                'BillRecordCommittees',
+                'BillRecordHistories',
+                'BillRecordProgresses',
+                'BillRecordReferrals',
+                'BillRecordSasts',
+                'BillRecordSessions',
+                'BillRecordSponsors',
+                'BillRecordSubjects',
+                'BillRecordSupplements',
+                'BillRecordTexts',
+                'BillRecordVotes',
+            ])
+            ->first() ?? $table->newEmptyEntity();
+
+        try {
+            if (!$checker->isEntityExpired($entity)) {
+                return $entity;
+            }
+        } catch (TypeError $e) {
+            if (!$entity->isNew()) {
+                throw $e;
+            }
+        }
+
+        $entity->set('last_sync', Date::now());
+        $apiResponseBody = $this->legiscanApiService->getBill($billId);
+        if (!array_key_exists('bill', $apiResponseBody)) {
+            throw new InvalidResponseBodyException("getBill response body missing key 'bill'");
+        }
+
+        $bill = $apiResponseBody['bill'];
+        if ($bill->get('change_hash') !== $bill['change_hash']) {
+            // TODO: Patch data and all associations
+        }
+
+        // TODO: Return $table->saveOrFail()..
     }
 }
