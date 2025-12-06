@@ -21,14 +21,10 @@ class DataSyncService
         $this->legiscanApiService = $legiscanApiService;
     }
 
-    public function syncSessionList(StateAbbreviation $state, ResultSetCheckerInterface $checker, string $finder = 'byStateAbbreviation', ?array $finderOptions = null): array
+    public function syncSessionList(StateAbbreviation $state, ResultSetCheckerInterface $checker): array
     {
         $table = $this->fetchTable('SessionListRecords');
-        if (is_null($finderOptions)) {
-            $finderOptions = ['stateAbbreviation' => $state];
-        }
-
-        $entities = $table->find($finder, ...$finderOptions)->all();
+        $entities = $table->find('byStateAbbreviation', stateAbbreviation: $state)->all();
         if (!$checker->isSetExpired($entities)) {
             return [];
         }
@@ -67,14 +63,10 @@ class DataSyncService
         return $table->saveManyOrFail($entitiesToSave);
     }
 
-    public function syncMasterList(int $sessionId, ResultSetCheckerInterface $checker, string $finder = 'bySessionId', ?array $finderOptions = null): array
+    public function syncMasterList(int $sessionId, ResultSetCheckerInterface $checker): array
     {
         $table = $this->fetchTable('MasterListRecords');
-        if (is_null($finderOptions)) {
-            $finderOptions = ['sessionId' => $sessionId];
-        }
-
-        $entities = $table->find($finder, ...$finderOptions)->all();
+        $entities = $table->find('bySessionId', sessionId: $sessionId)->all();
         if (!$checker->isSetExpired($entities)) {
             return [];
         }
