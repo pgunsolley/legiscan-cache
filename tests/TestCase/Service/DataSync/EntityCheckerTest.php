@@ -8,6 +8,7 @@ use App\Service\DataSync\EntityChecker;
 use Cake\I18n\Date;
 use Cake\ORM\Entity;
 use PHPUnit\Framework\TestCase;
+use TypeError;
 
 class EntityCheckerTest extends TestCase
 {
@@ -73,6 +74,19 @@ class EntityCheckerTest extends TestCase
             ->with('last_sync')
             ->willReturn(Date::now());
         $this->assertFalse($checker->isEntityExpired($mockEntity));
+    }
+
+    public function testIsEntityExpired_targetFieldNotValidDateTime_throwTypeError(): void
+    {
+        $checker = new EntityChecker();
+        $mockEntity = $this->createMock(Entity::class);
+        $mockEntity
+            ->expects($this->once())
+            ->method('get')
+            ->with('last_sync')
+            ->willReturn(null);
+        $this->expectException(TypeError::class);
+        $checker->isEntityExpired($mockEntity);
     }
 
     public function testGetField(): void
