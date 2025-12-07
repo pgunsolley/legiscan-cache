@@ -58,7 +58,7 @@ class CreateBillRecordSponsorLinks extends BaseMigration
                 'null' => true,
             ])
             ->addColumn('created', 'datetime')
-            ->addColumn('modified',' datetime')
+            ->addColumn('modified', 'datetime')
             ->create();
     }
 }
