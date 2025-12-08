@@ -128,7 +128,7 @@ class BillRecordSponsorLinksTable extends Table
     public function buildRules(RulesChecker $rules): RulesChecker
     {
         $rules->add($rules->existsIn(['bill_record_sponsor_id'], 'BillRecordSponsors'), ['errorField' => 'bill_record_sponsor_id']);
-
+        $rules->add($rules->isUnique(['bill_record_sponsor_id', 'bill_record_sponsor_link_type', 'bluesky', 'facebook', 'instagram', 'linkedin', 'tiktok', 'twitter', 'website', 'youtube']));
         return $rules;
     }
 }

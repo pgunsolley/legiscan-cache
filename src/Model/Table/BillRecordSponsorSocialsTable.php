@@ -117,7 +117,7 @@ class BillRecordSponsorSocialsTable extends Table
     public function buildRules(RulesChecker $rules): RulesChecker
     {
         $rules->add($rules->existsIn(['bill_record_sponsor_id'], 'BillRecordSponsors'), ['errorField' => 'bill_record_sponsor_id']);
-
+        $rules->add($rules->isUnique(['bill_record_sponsor_id', 'capitol_phone', 'district_phone', 'email', 'webmail', 'biography', 'image', 'ballotpedia', 'votesmart']));
         return $rules;
     }
 }
