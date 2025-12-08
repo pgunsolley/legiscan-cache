@@ -148,6 +148,9 @@ class DataSyncService
 
         $bill = $apiResponseBody['bill'];
         $patchData = [];
+        // TODO: Rewrite this.. the current design was based on the decision to delete existing records and saving
+        // TODO: the sync'd data as new entities.
+        // TODO: Instead, rewrite to reuse/update existing entities, and only add entities for new data.
         if ($bill->get('change_hash') !== $bill['change_hash']) {
             if (array_key_exists('session', $bill)) {
                 $patchData['bill_record_session'] = $bill['session'];
