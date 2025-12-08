@@ -50,6 +50,15 @@ class BillRecordSponsorsTable extends Table
             'foreignKey' => 'bill_record_id',
             'joinType' => 'INNER',
         ]);
+        $this->hasOne('BillRecordSponsorCapitolAddresses', [
+            'foreignKey' => 'bill_record_sponsor_id',
+        ]);
+        $this->hasOne('BillRecordSponsorSocials', [
+            'foreignKey' => 'bill_record_sponsor_id',
+        ]);
+        $this->hasMany('BillRecordSponsorLinks', [
+            'foreignKey' => 'bill_record_sponsor_id',
+        ]);
     }
 
     /**
