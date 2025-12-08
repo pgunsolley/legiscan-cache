@@ -9,6 +9,7 @@ use App\Service\DataSync\EntityCheckerInterface;
 use App\Service\DataSync\Exception\InvalidResponseBodyException;
 use App\Service\DataSync\ResultSetCheckerInterface;
 use App\Utility\StateAbbreviation;
+use Cake\Collection\Collection;
 use Cake\I18n\Date;
 use Cake\ORM\Locator\LocatorAwareTrait;
 use TypeError;
@@ -124,7 +125,9 @@ class DataSyncService
             'BillRecordTexts',
             'BillRecordVotes',
         ];
+        /** @var \App\Model\Table\BillRecordsTable $table */
         $table = $this->fetchTable('BillRecords');
+        /** @var \App\Model\Entity\BillRecord $entity */
         $entity = $table
             ->find('byBillId', billId: $billId)
             ->contain($associatedConfig)
@@ -147,36 +150,89 @@ class DataSyncService
         }
 
         $bill = $apiResponseBody['bill'];
-        $patchData = [];
-        // TODO: Rewrite this.. the current design was based on the decision to delete existing records and saving
-        // TODO: the sync'd data as new entities.
-        // TODO: Instead, rewrite to reuse/update existing entities, and only add entities for new data.
+        // TODO: Perform validation on associations as soon as possible to exit handle/exit as soon as possible,
+        // TODO: But only UPDATE/CREATE as a single ORM op at the end.
         if ($bill->get('change_hash') !== $bill['change_hash']) {
             if (array_key_exists('session', $bill)) {
-                $patchData['bill_record_session'] = $bill['session'];
-                unset($bill['session']);
+                /** @var \App\Model\Table\BillRecordSessionsTable $billRecordSessionsTable */
+                $billRecordSessionsTable = $this->fetchTable('BillRecordSessions');
+                /** @var \App\Model\Entity\BillRecordSession $billRecordSessionEntity */
+                $billRecordSessionEntity = $entity->get('bill_record_session') ?? $billRecordSessionsTable->newEmptyEntity();
+                $billRecordSessionsTable->patchEntity($billRecordSessionEntity, $bill['session']);
+                // Note: Perform validation error handling  here, if necessary.
+                if ($billRecordSessionEntity->isNew()) {
+                    $entity->set('bill_record_session', $billRecordSessionEntity);
+                }
             }
 
             if (array_key_exists('progress', $bill)) {
-                $patchData['bill_record_progresses'] = $bill['progress'];
-                unset($bill['progress']);
+                /** @var \App\Model\Table\BillRecordProgressesTable $billRecordProgressesTable */
+                $billRecordProgressesTable = $this->fetchTable('BillRecordProgresses');
+                /** @var \App\Model\Entity\BillRecordProgress[] $billRecordProgressEntities */
+                $billRecordProgressEntities = $entity->get('bill_record_progresses');
+                $billRecordProgressCollection = new Collection($billRecordProgressEntities);
+                foreach ($bill['progress'] as $progress) {
+                    /** @var \App\Model\Entity\BillRecordProgress $billRecordProgressEntity */
+                    $billRecordProgressEntity = $billRecordProgressCollection->firstMatch([
+                        'date' => $progress['date'],
+                        'event' => $progress['event'],
+                    ]) ?? $billRecordProgressesTable->newEmptyEntity();
+                    $billRecordProgressesTable->patchEntity($billRecordProgressEntity, $progress);
+                    // Note: Perform validation error handling here, if necessary.
+                    if ($billRecordProgressEntity->isNew()) {
+                        $billRecordProgressEntities[] = $billRecordProgressEntity;
+                    }
+                }
             }
 
             if (array_key_exists('committee', $bill)) {
-                $patchData['bill_record_committees'] = $bill['committee'];
-                unset($bill['committee']);
+                /** @var \App\Model\Table\BillRecordCommitteesTable $billRecordCommitteesTable */
+                $billRecordCommitteesTable = $this->fetchTable('BillRecordCommittees');
+                /** @var \App\Model\Entity\BillRecordCommittee[] $billRecordCommitteeEntities */
+                $billRecordCommitteeEntities = $entity->get('bill_record_committees');
+                $billRecordCommitteeCollection = new Collection($billRecordCommitteeEntities);
+                foreach ($bill['committee'] as $committee) {
+                    /** @var \App\Model\Entity\BillRecordCommittee $billRecordCommitteeEntity */
+                    $billRecordCommitteeEntity = $billRecordCommitteeCollection->firstMatch([
+                        'committee_id' => $committee['committee_id'],
+                        'name' => $committee['name'],
+                        'chamber_id' => $committee['chamber_id'],
+                    ]) ?? $billRecordCommitteesTable->newEmptyEntity();
+                    $billRecordCommitteesTable->patchEntity($billRecordCommitteeEntity, $committee);
+                    // Note: Perform validation error handling here, if necessary.
+                    if ($billRecordCommitteeEntity->isNew()) {
+                        $billRecordCommitteeEntities[] = $billRecordCommitteeEntity;
+                    }
+                }
             }
 
             if (array_key_exists('referrals', $bill)) {
-                $patchData['bill_record_referrals'] = $bill['referrals'];
-                unset($bill['referrals']);
+                /** @var \App\Model\Table\BillRecordReferralsTable $billRecordReferralsTable */
+                $billRecordReferralsTable = $this->fetchTable('BillRecordReferrals');
+                /** @var \App\Model\Entity\BillRecordReferral[] $billRecordReferralEntities */
+                $billRecordReferralEntities = $entity->get('bill_record_referrals');
+                $billRecordReferralCollection = new Collection($billRecordReferralEntities);
+                foreach ($bill['referrals'] as $referral) {
+                    /** @var \App\Model\Entity\BillRecordReferral $billRecordReferralEntity */
+                    $billRecordReferralEntity = $billRecordReferralCollection->firstMatch([
+                        'date' => $referral['date'],
+                        'committee_id' => $referral['committee_id'],
+                        'chamber_id' => $referral['chamber_id'],
+                        'name' => $referral['name'],
+                    ]) ?? $billRecordReferralsTable->newEmptyEntity();
+                    $billRecordReferralsTable->patchEntity($billRecordReferralEntity, $referral);
+                    // Note: Perform validation error handling here, if necessary.
+                    if ($billRecordReferralEntity->isNew()) {
+                        $billRecordReferralEntities[] = $billRecordReferralEntity;
+                    }
+                }
             }
 
             if (array_key_exists('history', $bill)) {
-                $patchData['bill_record_histories'] = $bill['history'];
-                unset($bill['history']);
+                
             }
 
+            // TODO: Rewrite this block after rewriting the others
             if (array_key_exists('sponsors', $bill) && is_array($bill['sponsors'])) {
                 foreach ($bill['sponsors'] as $sponsor) {
                     $sponsorPatchData = [];
@@ -213,48 +269,36 @@ class DataSyncService
             }
 
             if (array_key_exists('sasts', $bill)) {
-                $patchData['bill_record_sasts'] = $bill['sasts'];
-                unset($bill['sasts']);
+                
             }
 
             if (array_key_exists('subjects', $bill)) {
-                $patchData['bill_record_subjects'] = $bill['subjects'];
-                unset($bill['subjects']);
+                
             }
 
             if (array_key_exists('texts', $bill)) {
-                $patchData['bill_record_texts'] = $bill['texts'];
-                unset($bill['texts']);
+                
             }
 
             if (array_key_exists('votes', $bill)) {
-                $patchData['bill_record_votes'] = $bill['votes']; 
-                unset($bill['votes']);
+                
             }
 
             if (array_key_exists('amendments', $bill)) {
-                $patchData['bill_record_amendments'] = $bill['amendments'];
-                unset($bill['amendments']);
+                
             }
 
             if (array_key_exists('supplements', $bill)) {
-                $patchData['bill_record_supplements'] = $bill['supplements'];
-                unset($bill['supplements']);
+                
             }
 
             if (array_key_exists('calendar', $bill)) {
-                $patchData['bill_record_calendars'] = $bill['calendar'];
-                unset($bill['calendar']);
+                
             }
 
-            $patchData = [...$patchData, ...$bill];
-            $table->patchEntity($entity, $patchData, [
-                'associated' => $associatedConfig,
-            ]);
+            
         }
 
-        return $table->saveManyOrFail($entity, [
-            'associated' => $associatedConfig,
-        ]);
+        
     }
 }
