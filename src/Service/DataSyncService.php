@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Model\Enum\BillRecordSponsorLinkType;
 use App\Service\DataSync\EntityCheckerInterface;
 use App\Service\DataSync\Exception\InvalidResponseBodyException;
 use App\Service\DataSync\ResultSetCheckerInterface;
@@ -106,24 +107,27 @@ class DataSyncService
 
     public function syncBill(int $billId, EntityCheckerInterface $checker)
     {
+        $associatedConfig = [
+            'BillRecordAmendments',
+            'BillRecordCalendars',
+            'BillRecordCommittees',
+            'BillRecordHistories',
+            'BillRecordProgresses',
+            'BillRecordReferrals',
+            'BillRecordSasts',
+            'BillRecordSessions',
+            'BillRecordSponsors.BillRecordSponsorSocials',
+            'BillRecordSponsors.BillRecordSponsorCapitolAddresses',
+            'BillRecordSponsors.BillRecordSponsorLinks',
+            'BillRecordSubjects',
+            'BillRecordSupplements',
+            'BillRecordTexts',
+            'BillRecordVotes',
+        ];
         $table = $this->fetchTable('BillRecords');
         $entity = $table
             ->find('byBillId', billId: $billId)
-            ->contain([
-                'BillRecordAmendments',
-                'BillRecordCalendars',
-                'BillRecordCommittees',
-                'BillRecordHistories',
-                'BillRecordProgresses',
-                'BillRecordReferrals',
-                'BillRecordSasts',
-                'BillRecordSessions',
-                'BillRecordSponsors',
-                'BillRecordSubjects',
-                'BillRecordSupplements',
-                'BillRecordTexts',
-                'BillRecordVotes',
-            ])
+            ->contain($associatedConfig)
             ->first() ?? $table->newEmptyEntity();
 
         try {
@@ -143,10 +147,111 @@ class DataSyncService
         }
 
         $bill = $apiResponseBody['bill'];
+        $patchData = [];
         if ($bill->get('change_hash') !== $bill['change_hash']) {
-            // TODO: Patch data and all associations
+            if (array_key_exists('session', $bill)) {
+                $patchData['bill_record_session'] = $bill['session'];
+                unset($bill['session']);
+            }
+
+            if (array_key_exists('progress', $bill)) {
+                $patchData['bill_record_progresses'] = $bill['progress'];
+                unset($bill['progress']);
+            }
+
+            if (array_key_exists('committee', $bill)) {
+                $patchData['bill_record_committees'] = $bill['committee'];
+                unset($bill['committee']);
+            }
+
+            if (array_key_exists('referrals', $bill)) {
+                $patchData['bill_record_referrals'] = $bill['referrals'];
+                unset($bill['referrals']);
+            }
+
+            if (array_key_exists('history', $bill)) {
+                $patchData['bill_record_histories'] = $bill['history'];
+                unset($bill['history']);
+            }
+
+            if (array_key_exists('sponsors', $bill) && is_array($bill['sponsors'])) {
+                foreach ($bill['sponsors'] as $sponsor) {
+                    $sponsorPatchData = [];
+                    if (array_key_exists('bio', $sponsor)) {
+                        if (array_key_exists('social', $sponsor['bio'])) {
+                            $sponsorPatchData['bill_record_sponsor_social'] = $sponsor['bio']['social'];
+                        }
+
+                        if (array_key_exists('capitol_address', $sponsor['bio'])) {
+                            $sponsorPatchData['bill_record_sponsor_capitol_address'] = $sponsor['bio']['capitol_address'];
+                        }
+
+                        if (array_key_exists('links', $sponsor['bio'])) {
+                            if (array_key_exists('official', $sponsor['bio']['links'])) {
+                                $sponsorPatchData['bill_record_sponsor_links'][] = [
+                                    'bill_record_sponsor_link_type' => BillRecordSponsorLinkType::Official,
+                                    ...$sponsor['bio']['links']['official'],
+                                ];
+                            }
+
+                            if (array_key_exists('personal', $sponsor['bio']['links'])) {
+                                $sponsorPatchData['bill_record_sponsor_links'][] = [
+                                    'bill_record_sponsor_link_type' => BillRecordSponsorLinkType::Personal,
+                                    ...$sponsor['bio']['links']['personal'],
+                                ];
+                            }
+                        }
+                        
+                        unset($sponsor['bio']);
+                    }
+
+                    $patchData['bill_record_sponsors'][] = [...$sponsorPatchData, ...$sponsor];
+                }
+            }
+
+            if (array_key_exists('sasts', $bill)) {
+                $patchData['bill_record_sasts'] = $bill['sasts'];
+                unset($bill['sasts']);
+            }
+
+            if (array_key_exists('subjects', $bill)) {
+                $patchData['bill_record_subjects'] = $bill['subjects'];
+                unset($bill['subjects']);
+            }
+
+            if (array_key_exists('texts', $bill)) {
+                $patchData['bill_record_texts'] = $bill['texts'];
+                unset($bill['texts']);
+            }
+
+            if (array_key_exists('votes', $bill)) {
+                $patchData['bill_record_votes'] = $bill['votes']; 
+                unset($bill['votes']);
+            }
+
+            if (array_key_exists('amendments', $bill)) {
+                $patchData['bill_record_amendments'] = $bill['amendments'];
+                unset($bill['amendments']);
+            }
+
+            if (array_key_exists('supplements', $bill)) {
+                $patchData['bill_record_supplements'] = $bill['supplements'];
+                unset($bill['supplements']);
+            }
+
+            if (array_key_exists('calendar', $bill)) {
+                $patchData['bill_record_calendars'] = $bill['calendar'];
+                unset($bill['calendar']);
+            }
+
+            $patchData = [...$patchData, ...$bill];
+            $table->patchEntity($entity, $patchData, [
+                'associated' => $associatedConfig,
+            ]);
         }
 
-        // TODO: Return $table->saveOrFail()..
+        return $table->saveManyOrFail($entity, [
+            'associated' => $associatedConfig,
+        ]);
     }
 }

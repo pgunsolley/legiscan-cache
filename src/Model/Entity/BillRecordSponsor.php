@@ -35,6 +35,9 @@ use Cake\ORM\Entity;
  * @property int|null $committee_sponsor
  * @property int|null $committee_id
  * @property int|null $state_federal
+ * @property \App\Model\Entity\BillRecordSponsorSocial|null $bill_record_sponsor_social
+ * @property \App\Model\Entity\BillRecordSponsorCapitolAddress|null $bill_record_sponsor_capitol_address
+ * @property \App\Model\Entity\BillRecordSponsorLink[]|null $bill_record_sponsor_links
  * @property \Cake\I18n\DateTime $created
  * @property \Cake\I18n\DateTime $modified
  *
@@ -81,5 +84,8 @@ class BillRecordSponsor extends Entity
         'created' => true,
         'modified' => true,
         'bill_record' => true,
+        'bill_record_sponsor_social' => true,
+        'bill_record_sponsor_capitol_address' => true,
+        'bill_record_sponsor_links' => true,
     ];
 }
