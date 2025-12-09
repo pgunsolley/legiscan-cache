@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Model\Enum\BillRecordSponsorLinkType;
+use App\Service\DataSync\AssociationMerger;
 use App\Service\DataSync\EntityCheckerInterface;
 use App\Service\DataSync\Exception\InvalidMatchException;
 use App\Service\DataSync\Exception\InvalidResponseBodyException;
@@ -148,188 +149,206 @@ class DataSyncService
             }
         }
 
-        $entity->set('last_sync', Date::now());
         $apiResponseBody = $this->legiscanApiService->getBill($billId);
         if (!array_key_exists('bill', $apiResponseBody)) {
             throw new InvalidResponseBodyException("getBill response body missing key 'bill'");
         }
 
-        // TODO: Replace with AssociationMerger
-        $mergeAssociated = function (string $associationName, array $data, ?callable $matcher = null) use ($entity, $table) {
-            $association = $table->getAssociation($associationName);
-            $property = $association->getProperty();
-            $associated = $entity->get($property) ?? $association->newEmptyEntity();
-
-            switch ($association->type()) {
-                case Association::ONE_TO_ONE:
-                    $association->patchEntity($associated, $data);
-                    if ($entity->isNew()) {
-                        $associated->set($property, $associated);
-                    }
-                    break;
-                case Association::ONE_TO_MANY:
-
-                    break;
-            }
-
-
-            // TODO: Add check for association type
-            /*
-            $associationTable = $this->fetchTable($associationName);
-            $associationEntities = $entity->get(Inflector::underscore($associationName));
-            $collection = new Collection($associationEntities);
-            foreach ($data as $item) {
-                $associationEntity = $matcher($collection, $item);
-                if (!($associationEntity instanceof EntityInterface) && $associationEntity !== null) {
-                    throw new InvalidMatchException('matcher result must be a single Entity or null');
-                }
-
-                if ($associationEntity === null) {
-                    $associationEntity = $associationTable->newEmptyEntity();
-                }
-
-                $associationTable->patchEntity($associationEntity, $item);
-                if ($associationEntity->isNew()) {
-                    $associationEntities[] = $associationEntity;
-                }
-            }
-            */
-        };
-
+        $entity->set('last_sync', Date::now());
+        $associationMerger = new AssociationMerger($entity);
         $bill = $apiResponseBody['bill'];
-        // TODO: Perform validation on associations as soon as possible to exit handle/exit as soon as possible,
-        // TODO: But only UPDATE/CREATE as a single ORM op at the end.
         if ($bill->get('change_hash') !== $bill['change_hash']) {
             if (array_key_exists('session', $bill)) {
-                /** @var \App\Model\Table\BillRecordSessionsTable $billRecordSessionsTable */
-                $billRecordSessionsTable = $this->fetchTable('BillRecordSessions');
-                /** @var \App\Model\Entity\BillRecordSession $billRecordSessionEntity */
-                $billRecordSessionEntity = $entity->get('bill_record_session') ?? $billRecordSessionsTable->newEmptyEntity();
-                $billRecordSessionsTable->patchEntity($billRecordSessionEntity, $bill['session']);
-                // Note: Perform validation error handling  here, if necessary.
-                if ($billRecordSessionEntity->isNew()) {
-                    $entity->set('bill_record_session', $billRecordSessionEntity);
-                }
+                $associationMerger->mergeOneToOne(
+                    associationName: 'BillRecordSessions',
+                    data: $bill['session'],
+                );
             }
 
             if (array_key_exists('progress', $bill)) {
-                
+                $associationMerger->mergeOneToMany(
+                    associationName: 'BillRecordProgresses',
+                    data: $bill['progress'], 
+                    matcher: fn(CollectionInterface $associated, array $item) => $associated->firstMatch([
+                        'date' => $item['date'],
+                        'event' => $item['event'],
+                    ]),
+                );
             }
 
             if (array_key_exists('committee', $bill)) {
-                
+                $associationMerger->mergeOneToMany(
+                    associationName: 'BillRecordCommittees',
+                    data: $bill['committee'], 
+                    matcher: fn(CollectionInterface $associated, array $item) => $associated->firstMatch([
+                        'committee_id' => $item['committee_id'],
+                        'chamber_id' => $item['chamber_id'],
+                        'name' => $item['name'],
+                    ]),
+                );
             }
 
             if (array_key_exists('referrals', $bill)) {
-                /** @var \App\Model\Table\BillRecordReferralsTable $billRecordReferralsTable */
-                $billRecordReferralsTable = $this->fetchTable('BillRecordReferrals');
-                /** @var \App\Model\Entity\BillRecordReferral[] $billRecordReferralEntities */
-                $billRecordReferralEntities = $entity->get('bill_record_referrals');
-                $billRecordReferralCollection = new Collection($billRecordReferralEntities);
-                foreach ($bill['referrals'] as $referral) {
-                    /** @var \App\Model\Entity\BillRecordReferral $billRecordReferralEntity */
-                    $billRecordReferralEntity = $billRecordReferralCollection->firstMatch([
-                        'date' => $referral['date'],
-                        'committee_id' => $referral['committee_id'],
-                        'chamber_id' => $referral['chamber_id'],
-                        'name' => $referral['name'],
-                    ]) ?? $billRecordReferralsTable->newEmptyEntity();
-                    $billRecordReferralsTable->patchEntity($billRecordReferralEntity, $referral);
-                    // Note: Perform validation error handling here, if necessary.
-                    if ($billRecordReferralEntity->isNew()) {
-                        $billRecordReferralEntities[] = $billRecordReferralEntity;
-                    }
-                }
+                $associationMerger->mergeOneToMany(
+                    associationName: 'BillRecordReferrals',
+                    data: $bill['referrals'], 
+                    matcher: fn(CollectionInterface $associated, array $item) => $associated->firstMatch([
+                        'date' => $item['date'],
+                        'committee_id' => $item['date'],
+                        'chamber_id' => $item['chamber_id'],
+                        'name' => $item['name'],
+                    ]),
+                );
             }
 
             if (array_key_exists('history', $bill)) {
-                /** @var \App\Model\Table\BillRecordHistoriesTable $billRecordHistoriesTable */
-                $billRecordHistoriesTable = $this->fetchTable('BillRecordHistories');
-                /** @var \App\Model\Entity\BillRecordHistory[] $billRecordHistoryEntities */
-                $billRecordHistoryEntities = $entity->get('bill_record_histories');
-                $billRecordHistoryCollection = new Collection($billRecordHistoryEntities);
-                foreach ($bill['history'] as $history) {
-                    /** @var \App\Model\Entity\BillRecordHistory $billRecordHistoryEntity */
-                    $billRecordHistoryEntity = $billRecordHistoryCollection->firstMatch([
-                        'date' => $history['date'],
-                        'chamber_id' => $history['chamber_id'],
-                        'action' => $history['action'],
-                    ]) ?? $billRecordHistoriesTable->newEmptyEntity();
-                    $billRecordHistoriesTable->patchEntity($billRecordHistoryEntity, $history);
-                    // Note: Perform validation error handling here, if necessary.
-                    if ($billRecordHistoryEntity->isNew()) {
-                        $billRecordHistoryEntities[] = $billRecordHistoryEntity;
-                    }
-                }
+                $associationMerger->mergeOneToMany(
+                    associationName: 'BillRecordHistories',
+                    data: $bill['history'], 
+                    matcher: fn(CollectionInterface $associated, array $item) => $associated->firstMatch([
+                        'date' => $item['date'],
+                        'chamber_id' => $item['chamber_id'],
+                        'action' => $item['action'],
+                    ]),
+                );
             }
 
-            // TODO: Rewrite this block after rewriting the others
-            if (array_key_exists('sponsors', $bill) && is_array($bill['sponsors'])) {
-                foreach ($bill['sponsors'] as $sponsor) {
-                    $sponsorPatchData = [];
-                    if (array_key_exists('bio', $sponsor)) {
-                        if (array_key_exists('social', $sponsor['bio'])) {
-                            $sponsorPatchData['bill_record_sponsor_social'] = $sponsor['bio']['social'];
-                        }
+            if (array_key_exists('sponsors', $bill)) {
+                $associationMerger->mergeOneToMany(
+                    associationName: 'BillRecordSponsors',
+                    data: $bill['sponsors'],
+                    matcher: static function (CollectionInterface $associated, array $item, Association $association) {
+                        $matched = $associated->firstMatch([
+                            'people_id' => $item['people_id'],
+                            'party_id' => $item['party_id'],
+                            'state_id' => $item['state_id'],
+                        ]) ?? $association->newEmptyEntity();
 
-                        if (array_key_exists('capitol_address', $sponsor['bio'])) {
-                            $sponsorPatchData['bill_record_sponsor_capitol_address'] = $sponsor['bio']['capitol_address'];
-                        }
-
-                        if (array_key_exists('links', $sponsor['bio'])) {
-                            if (array_key_exists('official', $sponsor['bio']['links'])) {
-                                $sponsorPatchData['bill_record_sponsor_links'][] = [
-                                    'bill_record_sponsor_link_type' => BillRecordSponsorLinkType::Official,
-                                    ...$sponsor['bio']['links']['official'],
-                                ];
+                        if (array_key_exists('bio', $item)) {
+                            $sponsorMerger = new AssociationMerger($matched);
+                            if (array_key_exists('social', $item['bio'])) {
+                                $sponsorMerger->mergeOneToOne(
+                                    associationName: 'BillRecordSponsorSocials',
+                                    data: $item['bio']['social'],
+                                );
                             }
 
-                            if (array_key_exists('personal', $sponsor['bio']['links'])) {
-                                $sponsorPatchData['bill_record_sponsor_links'][] = [
-                                    'bill_record_sponsor_link_type' => BillRecordSponsorLinkType::Personal,
-                                    ...$sponsor['bio']['links']['personal'],
-                                ];
+                            if (array_key_exists('capitol_address', $item['bio'])) {
+                                $sponsorMerger->mergeOneToOne(
+                                    associationName: 'BillRecordSponsorCapitolAddresses',
+                                    data: $item['bio']['capitol_address'],
+                                );
                             }
-                        }
-                        
-                        unset($sponsor['bio']);
-                    }
 
-                    $patchData['bill_record_sponsors'][] = [...$sponsorPatchData, ...$sponsor];
-                }
+                            // TODO: Figure out how to work with links
+                            // Links is an object with 2 properties that I normalized into 1 entity with a 'type' field
+                            // At this point, this will not work.
+                            if (array_key_exists('links', $item['bio'])) {
+                                $sponsorMerger->mergeOneToMany(
+                                    associationName: 'BillRecordSponsorLinks',
+                                    data: $item['bio']['links'],
+                                    transform: static function (array $item) {
+
+                                    },
+                                    matcher: static function (CollectionInterface $associated, array $item, Association $association) {
+
+                                    },
+                                );
+                            }
+
+                            unset($item['bio']);
+                        }
+
+                        return $matched;
+                    },
+                );
             }
 
             if (array_key_exists('sasts', $bill)) {
-                
+                $associationMerger->mergeOneToMany(
+                    associationName: 'BillRecordSasts',
+                    data: $bill['sasts'], 
+                    matcher: fn(CollectionInterface $associated, array $item) => $associated->firstMatch([
+                        'type_id' => $item['type_id'],
+                        'sast_bill_number' => $item['sast_bill_number'],
+                        'sast_bill_id' => $item['sast_bill_id'],
+                    ]),
+                );
             }
 
             if (array_key_exists('subjects', $bill)) {
-                
+                $associationMerger->mergeOneToMany(
+                    associationName: 'BillRecordSubjects',
+                    data: $bill['subjects'], 
+                    matcher: fn(CollectionInterface $associated, array $item) => $associated->firstMatch([
+                        'subject_id' => $item['subject_id'],
+                        'subject_name' => $item['subject_name'],
+                    ]),
+                );
             }
 
             if (array_key_exists('texts', $bill)) {
-                
+                $associationMerger->mergeOneToMany(
+                    associationName: 'BillRecordTexts',
+                    data: $bill['texts'], 
+                    matcher: fn(CollectionInterface $associated, array $item) => $associated->firstMatch([
+                        'doc_id' => $item['doc_id'],
+                        'date' => $item['date'],
+                        'type_id' => $item['type_id'],
+                    ]),
+                );
             }
 
             if (array_key_exists('votes', $bill)) {
-                
+                $associationMerger->mergeOneToMany(
+                    associationName: 'BillRecordVotes',
+                    data: $bill['votes'], 
+                    matcher: fn(CollectionInterface $associated, array $item) => $associated->firstMatch([
+                        'roll_call_id' => $item['roll_call_id'],
+                        'chamber_id' => $item['chamber_id'],
+                        'date' => $item['date'],
+                    ]),
+                );
             }
 
             if (array_key_exists('amendments', $bill)) {
-                
+                $associationMerger->mergeOneToMany(
+                    associationName: 'BillRecordAmendments',
+                    data: $bill['amendments'], 
+                    matcher: fn(CollectionInterface $associated, array $item) => $associated->firstMatch([
+                        'amendment_id' => $item['amendment_id'],
+                        'chamber_id' => $item['chamber_id'],
+                        'date' => $item['date'],
+                        'title' => $item['title'],
+                    ]),
+                );
             }
 
             if (array_key_exists('supplements', $bill)) {
-                
+                $associationMerger->mergeOneToMany(
+                    associationName: 'BillRecordSupplements',
+                    data: $bill['supplements'], 
+                    matcher: fn(CollectionInterface $associated, array $item) => $associated->firstMatch([
+                        'supplement_id' => $item['supplement_id'],
+                        'date' => $item['date'],
+                        'type_id' => $item['type_id'],
+                        'title' => $item['title'],
+                    ]),
+                );
             }
 
             if (array_key_exists('calendar', $bill)) {
-                
-            }
-
-            
+                $associationMerger->mergeOneToMany(
+                    associationName: 'BillRecordCalendars',
+                    data: $bill['calendar'], 
+                    matcher: fn(CollectionInterface $associated, array $item) => $associated->firstMatch([
+                        'type_id' => $item['type_id'],
+                        'date' => $item['date'],
+                        'time' => $item['time'],
+                        'description' => $item['description'],
+                    ]),
+                );
+            }            
         }
-
-        
     }
 }

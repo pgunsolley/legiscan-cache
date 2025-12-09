@@ -25,12 +25,19 @@ class EntityChecker implements EntityCheckerInterface
 
     public function getField(): string
     {
-        return $this->getConfig('field');
+        return $this->getConfigOrFail('field');
+    }
+
+    public function updateField(EntityInterface $entity): Date
+    {
+        $now = Date::now();
+        $entity->set($this->getField(), $now);
+        return $now;
     }
 
     public function isEntityExpired(EntityInterface $entity): bool
     {
-        $entityDate = Date::parse($entity->get($this->getConfigOrFail('field')));
+        $entityDate = Date::parse($entity->get($this->getField()));
         $interval = $this->getConfigOrFail('interval');
         if (is_string($interval)) {
             $inverval = new DateInterval($interval);

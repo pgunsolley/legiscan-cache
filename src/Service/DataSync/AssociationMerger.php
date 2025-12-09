@@ -77,16 +77,12 @@ class AssociationMerger
         }
 
         $associated = new Collection($associatedEntities);
-        return new Collection(array_map(static function ($item) use ($matcher, $transform, $association, $associated, $associatedEntities) {
+        return new Collection(array_map(static function ($item) use ($matcher, $transform, $association, $associated, &$associatedEntities) {
             if (!is_array($item)) {
                 throw new InvalidAssociationDataException('Associated data item must be an array');
             }
 
-            if ($transform !== null) {
-                $item = $transform($item);
-            }
-
-            $matched = $matcher($associated, $item);
+            $matched = $matcher($associated, $item, $association);
             if (!($matched instanceof EntityInterface) && $matched !== null) {
                 throw new InvalidMatchException('Matcher must return an instance of EntityInterface or null');
             }
@@ -94,6 +90,10 @@ class AssociationMerger
             if ($matched === null) {
                 /** @var \Cake\Datasource\EntityInterface $matched */
                 $matched = $association->newEmptyEntity();
+            }
+
+            if ($transform !== null) {
+                $item = $transform($item);
             }
 
             $association->patchEntity($matched, $item);
