@@ -6,12 +6,17 @@ namespace App\Service;
 
 use App\Model\Enum\BillRecordSponsorLinkType;
 use App\Service\DataSync\EntityCheckerInterface;
+use App\Service\DataSync\Exception\InvalidMatchException;
 use App\Service\DataSync\Exception\InvalidResponseBodyException;
 use App\Service\DataSync\ResultSetCheckerInterface;
 use App\Utility\StateAbbreviation;
 use Cake\Collection\Collection;
+use Cake\Collection\CollectionInterface;
+use Cake\Datasource\EntityInterface;
 use Cake\I18n\Date;
+use Cake\ORM\Association;
 use Cake\ORM\Locator\LocatorAwareTrait;
+use Cake\Utility\Inflector;
 use TypeError;
 
 class DataSyncService
@@ -149,6 +154,48 @@ class DataSyncService
             throw new InvalidResponseBodyException("getBill response body missing key 'bill'");
         }
 
+        // TODO: Replace with AssociationMerger
+        $mergeAssociated = function (string $associationName, array $data, ?callable $matcher = null) use ($entity, $table) {
+            $association = $table->getAssociation($associationName);
+            $property = $association->getProperty();
+            $associated = $entity->get($property) ?? $association->newEmptyEntity();
+
+            switch ($association->type()) {
+                case Association::ONE_TO_ONE:
+                    $association->patchEntity($associated, $data);
+                    if ($entity->isNew()) {
+                        $associated->set($property, $associated);
+                    }
+                    break;
+                case Association::ONE_TO_MANY:
+
+                    break;
+            }
+
+
+            // TODO: Add check for association type
+            /*
+            $associationTable = $this->fetchTable($associationName);
+            $associationEntities = $entity->get(Inflector::underscore($associationName));
+            $collection = new Collection($associationEntities);
+            foreach ($data as $item) {
+                $associationEntity = $matcher($collection, $item);
+                if (!($associationEntity instanceof EntityInterface) && $associationEntity !== null) {
+                    throw new InvalidMatchException('matcher result must be a single Entity or null');
+                }
+
+                if ($associationEntity === null) {
+                    $associationEntity = $associationTable->newEmptyEntity();
+                }
+
+                $associationTable->patchEntity($associationEntity, $item);
+                if ($associationEntity->isNew()) {
+                    $associationEntities[] = $associationEntity;
+                }
+            }
+            */
+        };
+
         $bill = $apiResponseBody['bill'];
         // TODO: Perform validation on associations as soon as possible to exit handle/exit as soon as possible,
         // TODO: But only UPDATE/CREATE as a single ORM op at the end.
@@ -166,44 +213,11 @@ class DataSyncService
             }
 
             if (array_key_exists('progress', $bill)) {
-                /** @var \App\Model\Table\BillRecordProgressesTable $billRecordProgressesTable */
-                $billRecordProgressesTable = $this->fetchTable('BillRecordProgresses');
-                /** @var \App\Model\Entity\BillRecordProgress[] $billRecordProgressEntities */
-                $billRecordProgressEntities = $entity->get('bill_record_progresses');
-                $billRecordProgressCollection = new Collection($billRecordProgressEntities);
-                foreach ($bill['progress'] as $progress) {
-                    /** @var \App\Model\Entity\BillRecordProgress $billRecordProgressEntity */
-                    $billRecordProgressEntity = $billRecordProgressCollection->firstMatch([
-                        'date' => $progress['date'],
-                        'event' => $progress['event'],
-                    ]) ?? $billRecordProgressesTable->newEmptyEntity();
-                    $billRecordProgressesTable->patchEntity($billRecordProgressEntity, $progress);
-                    // Note: Perform validation error handling here, if necessary.
-                    if ($billRecordProgressEntity->isNew()) {
-                        $billRecordProgressEntities[] = $billRecordProgressEntity;
-                    }
-                }
+                
             }
 
             if (array_key_exists('committee', $bill)) {
-                /** @var \App\Model\Table\BillRecordCommitteesTable $billRecordCommitteesTable */
-                $billRecordCommitteesTable = $this->fetchTable('BillRecordCommittees');
-                /** @var \App\Model\Entity\BillRecordCommittee[] $billRecordCommitteeEntities */
-                $billRecordCommitteeEntities = $entity->get('bill_record_committees');
-                $billRecordCommitteeCollection = new Collection($billRecordCommitteeEntities);
-                foreach ($bill['committee'] as $committee) {
-                    /** @var \App\Model\Entity\BillRecordCommittee $billRecordCommitteeEntity */
-                    $billRecordCommitteeEntity = $billRecordCommitteeCollection->firstMatch([
-                        'committee_id' => $committee['committee_id'],
-                        'name' => $committee['name'],
-                        'chamber_id' => $committee['chamber_id'],
-                    ]) ?? $billRecordCommitteesTable->newEmptyEntity();
-                    $billRecordCommitteesTable->patchEntity($billRecordCommitteeEntity, $committee);
-                    // Note: Perform validation error handling here, if necessary.
-                    if ($billRecordCommitteeEntity->isNew()) {
-                        $billRecordCommitteeEntities[] = $billRecordCommitteeEntity;
-                    }
-                }
+                
             }
 
             if (array_key_exists('referrals', $bill)) {
@@ -229,7 +243,24 @@ class DataSyncService
             }
 
             if (array_key_exists('history', $bill)) {
-                
+                /** @var \App\Model\Table\BillRecordHistoriesTable $billRecordHistoriesTable */
+                $billRecordHistoriesTable = $this->fetchTable('BillRecordHistories');
+                /** @var \App\Model\Entity\BillRecordHistory[] $billRecordHistoryEntities */
+                $billRecordHistoryEntities = $entity->get('bill_record_histories');
+                $billRecordHistoryCollection = new Collection($billRecordHistoryEntities);
+                foreach ($bill['history'] as $history) {
+                    /** @var \App\Model\Entity\BillRecordHistory $billRecordHistoryEntity */
+                    $billRecordHistoryEntity = $billRecordHistoryCollection->firstMatch([
+                        'date' => $history['date'],
+                        'chamber_id' => $history['chamber_id'],
+                        'action' => $history['action'],
+                    ]) ?? $billRecordHistoriesTable->newEmptyEntity();
+                    $billRecordHistoriesTable->patchEntity($billRecordHistoryEntity, $history);
+                    // Note: Perform validation error handling here, if necessary.
+                    if ($billRecordHistoryEntity->isNew()) {
+                        $billRecordHistoryEntities[] = $billRecordHistoryEntity;
+                    }
+                }
             }
 
             // TODO: Rewrite this block after rewriting the others
