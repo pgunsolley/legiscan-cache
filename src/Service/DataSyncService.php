@@ -164,7 +164,7 @@ class DataSyncService
                 $associationMerger->mergeOneToMany(
                     associationName: 'BillRecordProgresses',
                     data: $bill['progress'], 
-                    matcher: fn(CollectionInterface $associated, array $item) => $associated->firstMatch([
+                    match: fn(CollectionInterface $associated, array $item) => $associated->firstMatch([
                         'date' => $item['date'],
                         'event' => $item['event'],
                     ]),
@@ -175,7 +175,7 @@ class DataSyncService
                 $associationMerger->mergeOneToMany(
                     associationName: 'BillRecordCommittees',
                     data: $bill['committee'], 
-                    matcher: fn(CollectionInterface $associated, array $item) => $associated->firstMatch([
+                    match: fn(CollectionInterface $associated, array $item) => $associated->firstMatch([
                         'committee_id' => $item['committee_id'],
                         'chamber_id' => $item['chamber_id'],
                         'name' => $item['name'],
@@ -187,7 +187,7 @@ class DataSyncService
                 $associationMerger->mergeOneToMany(
                     associationName: 'BillRecordReferrals',
                     data: $bill['referrals'], 
-                    matcher: fn(CollectionInterface $associated, array $item) => $associated->firstMatch([
+                    match: fn(CollectionInterface $associated, array $item) => $associated->firstMatch([
                         'date' => $item['date'],
                         'committee_id' => $item['date'],
                         'chamber_id' => $item['chamber_id'],
@@ -200,7 +200,7 @@ class DataSyncService
                 $associationMerger->mergeOneToMany(
                     associationName: 'BillRecordHistories',
                     data: $bill['history'], 
-                    matcher: fn(CollectionInterface $associated, array $item) => $associated->firstMatch([
+                    match: fn(CollectionInterface $associated, array $item) => $associated->firstMatch([
                         'date' => $item['date'],
                         'chamber_id' => $item['chamber_id'],
                         'action' => $item['action'],
@@ -212,7 +212,7 @@ class DataSyncService
                 $associationMerger->mergeOneToMany(
                     associationName: 'BillRecordSponsors',
                     data: $bill['sponsors'],
-                    matcher: fn(CollectionInterface $associated, array $item) => $associated->firstMatch([
+                    match: fn(CollectionInterface $associated, array $item) => $associated->firstMatch([
                         'people_id' => $item['people_id'],
                         'party_id' => $item['party_id'],
                         'state_id' => $item['state_id'],
@@ -255,7 +255,7 @@ class DataSyncService
 
                                         return $prepared;
                                     },
-                                    matcher: fn(CollectionInterface $associated, array $item) => $associated->firstMatch([
+                                    match: fn(CollectionInterface $associated, array $item) => $associated->firstMatch([
                                         'bill_record_sponsor_link_type' => $item['bill_record_sponsor_link_type'],
                                     ]),
                                 );
@@ -273,7 +273,7 @@ class DataSyncService
                 $associationMerger->mergeOneToMany(
                     associationName: 'BillRecordSasts',
                     data: $bill['sasts'], 
-                    matcher: fn(CollectionInterface $associated, array $item) => $associated->firstMatch([
+                    match: fn(CollectionInterface $associated, array $item) => $associated->firstMatch([
                         'type_id' => $item['type_id'],
                         'sast_bill_number' => $item['sast_bill_number'],
                         'sast_bill_id' => $item['sast_bill_id'],
@@ -285,7 +285,7 @@ class DataSyncService
                 $associationMerger->mergeOneToMany(
                     associationName: 'BillRecordSubjects',
                     data: $bill['subjects'], 
-                    matcher: fn(CollectionInterface $associated, array $item) => $associated->firstMatch([
+                    match: fn(CollectionInterface $associated, array $item) => $associated->firstMatch([
                         'subject_id' => $item['subject_id'],
                         'subject_name' => $item['subject_name'],
                     ]),
@@ -296,7 +296,7 @@ class DataSyncService
                 $associationMerger->mergeOneToMany(
                     associationName: 'BillRecordTexts',
                     data: $bill['texts'], 
-                    matcher: fn(CollectionInterface $associated, array $item) => $associated->firstMatch([
+                    match: fn(CollectionInterface $associated, array $item) => $associated->firstMatch([
                         'doc_id' => $item['doc_id'],
                         'date' => $item['date'],
                         'type_id' => $item['type_id'],
@@ -308,7 +308,7 @@ class DataSyncService
                 $associationMerger->mergeOneToMany(
                     associationName: 'BillRecordVotes',
                     data: $bill['votes'], 
-                    matcher: fn(CollectionInterface $associated, array $item) => $associated->firstMatch([
+                    match: fn(CollectionInterface $associated, array $item) => $associated->firstMatch([
                         'roll_call_id' => $item['roll_call_id'],
                         'chamber_id' => $item['chamber_id'],
                         'date' => $item['date'],
@@ -320,7 +320,7 @@ class DataSyncService
                 $associationMerger->mergeOneToMany(
                     associationName: 'BillRecordAmendments',
                     data: $bill['amendments'], 
-                    matcher: fn(CollectionInterface $associated, array $item) => $associated->firstMatch([
+                    match: fn(CollectionInterface $associated, array $item) => $associated->firstMatch([
                         'amendment_id' => $item['amendment_id'],
                         'chamber_id' => $item['chamber_id'],
                         'date' => $item['date'],
@@ -333,7 +333,7 @@ class DataSyncService
                 $associationMerger->mergeOneToMany(
                     associationName: 'BillRecordSupplements',
                     data: $bill['supplements'], 
-                    matcher: fn(CollectionInterface $associated, array $item) => $associated->firstMatch([
+                    match: fn(CollectionInterface $associated, array $item) => $associated->firstMatch([
                         'supplement_id' => $item['supplement_id'],
                         'date' => $item['date'],
                         'type_id' => $item['type_id'],
@@ -346,7 +346,7 @@ class DataSyncService
                 $associationMerger->mergeOneToMany(
                     associationName: 'BillRecordCalendars',
                     data: $bill['calendar'], 
-                    matcher: fn(CollectionInterface $associated, array $item) => $associated->firstMatch([
+                    match: fn(CollectionInterface $associated, array $item) => $associated->firstMatch([
                         'type_id' => $item['type_id'],
                         'date' => $item['date'],
                         'time' => $item['time'],

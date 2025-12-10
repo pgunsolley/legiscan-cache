@@ -82,7 +82,7 @@ class AssociationMerger
     /**
      * @param string $associationName The name of the association
      * @param array<array> $data The data to patch into the entity
-     * @param callable(\Cake\Collection\CollectionInterface $associated, array $item): null|\Cake\Datasource\EntityInterface $matcher 
+     * @param callable(\Cake\Collection\CollectionInterface $associated, array $item): null|\Cake\Datasource\EntityInterface $match 
      *          Callable that returns an EntityInterface matching the given $data item on each iteration
      * @param null|callable(array $data): array $prepare A callable that is called with the entire $data array before iteration. 
      *          The returned array will replace the $data array.
@@ -95,7 +95,7 @@ class AssociationMerger
     public function mergeOneToMany(
         string $associationName,
         array $data,
-        callable $matcher,
+        callable $match,
         ?callable $prepare = null,
         ?callable $descend = null,
         ?callable $transform = null,
@@ -130,7 +130,7 @@ class AssociationMerger
 
         $associated = new Collection($associatedEntities);
         return new Collection(array_map(function ($item) use (
-            $matcher,
+            $match,
             $transform,
             $association,
             $associated,
@@ -141,9 +141,9 @@ class AssociationMerger
                 throw new InvalidAssociationDataException('Associated data item must be an array');
             }
 
-            $matched = $matcher($associated, $item);
+            $matched = $match($associated, $item);
             if (!($matched instanceof EntityInterface) && $matched !== null) {
-                throw new InvalidMatchException('Matcher must return an instance of EntityInterface or null');
+                throw new InvalidMatchException('match must return an instance of EntityInterface or null');
             }
 
             if ($matched === null) {
