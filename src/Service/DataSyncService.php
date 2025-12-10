@@ -7,17 +7,12 @@ namespace App\Service;
 use App\Model\Enum\BillRecordSponsorLinkType;
 use App\Service\DataSync\AssociationMerger;
 use App\Service\DataSync\EntityCheckerInterface;
-use App\Service\DataSync\Exception\InvalidMatchException;
 use App\Service\DataSync\Exception\InvalidResponseBodyException;
 use App\Service\DataSync\ResultSetCheckerInterface;
 use App\Utility\StateAbbreviation;
-use Cake\Collection\Collection;
 use Cake\Collection\CollectionInterface;
-use Cake\Datasource\EntityInterface;
 use Cake\I18n\Date;
-use Cake\ORM\Association;
 use Cake\ORM\Locator\LocatorAwareTrait;
-use Cake\Utility\Inflector;
 use TypeError;
 
 class DataSyncService
@@ -217,15 +212,13 @@ class DataSyncService
                 $associationMerger->mergeOneToMany(
                     associationName: 'BillRecordSponsors',
                     data: $bill['sponsors'],
-                    matcher: static function (CollectionInterface $associated, array $item, Association $association) {
-                        $matched = $associated->firstMatch([
-                            'people_id' => $item['people_id'],
-                            'party_id' => $item['party_id'],
-                            'state_id' => $item['state_id'],
-                        ]) ?? $association->newEmptyEntity();
-
+                    matcher: fn(CollectionInterface $associated, array $item) => $associated->firstMatch([
+                        'people_id' => $item['people_id'],
+                        'party_id' => $item['party_id'],
+                        'state_id' => $item['state_id'],
+                    ]),
+                    descend: static function (AssociationMerger $sponsorMerger, array $item) {
                         if (array_key_exists('bio', $item)) {
-                            $sponsorMerger = new AssociationMerger($matched);
                             if (array_key_exists('social', $item['bio'])) {
                                 $sponsorMerger->mergeOneToOne(
                                     associationName: 'BillRecordSponsorSocials',
@@ -267,11 +260,11 @@ class DataSyncService
                                     ]),
                                 );
                             }
-
-                            unset($item['bio']);
                         }
-
-                        return $matched;
+                    },
+                    transform: static function (array $item) {
+                        unset($item['bio']);
+                        return $item;
                     },
                 );
             }
@@ -363,7 +356,7 @@ class DataSyncService
             }            
         }
 
-        $table->saveOrFail($entity, [
+        return $table->saveOrFail($entity, [
             'associated' => $associatedConfig,
         ]);
     }
