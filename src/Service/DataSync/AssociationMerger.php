@@ -35,7 +35,7 @@ class AssociationMerger
      * @param array<int|string,mixed> $data The data to patch into the entity
      * @param null|callable(AssociationMerger $merger, array $data) $descend 
      *      A callable that allows descending into deeper associations
-     * @param null|callable(array<int|string,mixed> $data): array<int|string,mixed> $transform 
+     * @param null|callable(array<int|string,mixed> $data): array<int|string,mixed> $beforeMerge 
      *      A callable that allows modification to $data before it is patched.
      * @return \Cake\Datasource\EntityInterface
      */
@@ -43,7 +43,7 @@ class AssociationMerger
         string $associationName,
         array $data,
         ?callable $descend = null,
-        ?callable $transform = null,
+        ?callable $beforeMerge = null,
     ): EntityInterface {
         $association = $this->table->getAssociation($associationName);
         $property = $association->getProperty();
@@ -62,13 +62,13 @@ class AssociationMerger
             $descend(new self($associated), $data);
         }
 
-        if ($transform !== null) {
-            $transformedData = $transform($data);
-            if (!is_array($transformedData)) {
-                throw new TypeError('Transform must return array');
+        if ($beforeMerge !== null) {
+            $beforeMergedData = $beforeMerge($data);
+            if (!is_array($beforeMergedData)) {
+                throw new TypeError('beforeMerge must return array');
             }
 
-            $data = $transformedData;
+            $data = $beforeMergedData;
         }
 
         $association->patchEntity($associated, $data);
@@ -88,7 +88,7 @@ class AssociationMerger
      *          The returned array will replace the $data array.
      * @param null|callable(AssociationMerger $merger, array $item) $descend 
      *          A callable that allows descending into deeper associations
-     * @param null|callable(array $item): array $transform A callable called on each $data item iteration allowing modification 
+     * @param null|callable(array $item): array $beforeMerge A callable called on each $data item iteration allowing modification 
      *          for each record before it is patched.
      * @return \Cake\Collection\CollectionInterface
      */
@@ -98,7 +98,7 @@ class AssociationMerger
         callable $match,
         ?callable $prepare = null,
         ?callable $descend = null,
-        ?callable $transform = null,
+        ?callable $beforeMerge = null,
     ): CollectionInterface {
         $association = $this->table->getAssociation($associationName);
         $property = $association->getProperty();
@@ -131,7 +131,7 @@ class AssociationMerger
         $associated = new Collection($associatedEntities);
         return new Collection(array_map(function ($item) use (
             $match,
-            $transform,
+            $beforeMerge,
             $association,
             $associated,
             &$associatedEntities,
@@ -155,13 +155,13 @@ class AssociationMerger
                 $descend(new self($matched), $item);
             }
 
-            if ($transform !== null) {
-                $transformedItem = $transform($item);
-                if (!is_array($transformedItem)) {
-                    throw new TypeError('Transform must return array');
+            if ($beforeMerge !== null) {
+                $beforeMergedItem = $beforeMerge($item);
+                if (!is_array($beforeMergedItem)) {
+                    throw new TypeError('beforeMerge must return array');
                 }
 
-                $item = $transformedItem;
+                $item = $beforeMergedItem;
             }
 
             $association->patchEntity($matched, $item);

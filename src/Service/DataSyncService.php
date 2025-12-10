@@ -262,7 +262,7 @@ class DataSyncService
                             }
                         }
                     },
-                    transform: static function (array $item) {
+                    beforeMerge: static function (array $item) {
                         unset($item['bio']);
                         return $item;
                     },
