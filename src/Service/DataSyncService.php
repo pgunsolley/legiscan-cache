@@ -240,19 +240,31 @@ class DataSyncService
                                 );
                             }
 
-                            // TODO: Figure out how to work with links
-                            // Links is an object with 2 properties that I normalized into 1 entity with a 'type' field
-                            // At this point, this will not work.
                             if (array_key_exists('links', $item['bio'])) {
                                 $sponsorMerger->mergeOneToMany(
                                     associationName: 'BillRecordSponsorLinks',
                                     data: $item['bio']['links'],
-                                    transform: static function (array $item) {
+                                    prepare: static function (array $data) {
+                                        $prepared = [];
+                                        if (array_key_exists('personal', $data)) {
+                                            $prepared[] = [
+                                                'bill_record_sponsor_link_type' => BillRecordSponsorLinkType::Personal,
+                                                ...$data['personal'],
+                                            ];
+                                        }
 
-                                    },
-                                    matcher: static function (CollectionInterface $associated, array $item, Association $association) {
+                                        if (array_key_exists('official', $data)) {
+                                            $prepared[] = [
+                                                'bill_record_sponsor_link_type' => BillRecordSponsorLinkType::Official,
+                                                ...$data['official'],
+                                            ];
+                                        }
 
+                                        return $prepared;
                                     },
+                                    matcher: fn(CollectionInterface $associated, array $item) => $associated->firstMatch([
+                                        'bill_record_sponsor_link_type' => $item['bill_record_sponsor_link_type'],
+                                    ]),
                                 );
                             }
 

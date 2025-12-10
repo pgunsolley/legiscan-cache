@@ -60,10 +60,11 @@ class AssociationMerger
      * @param string $associationName
      * @param array<array> $data
      * @param callable(\Cake\Collection\CollectionInterface $associated, array $item): null|\Cake\Datasource\EntityInterface $matcher
+     * @param null|callable(array $data): array $prepare
      * @param null|callable(array $item): array $transform
      * @return \Cake\Collection\CollectionInterface
      */
-    public function mergeOneToMany(string $associationName, array $data, callable $matcher, ?callable $transform = null): CollectionInterface
+    public function mergeOneToMany(string $associationName, array $data, callable $matcher, ?callable $prepare = null, ?callable $transform = null): CollectionInterface
     {
         $association = $this->table->getAssociation($associationName);
         $property = $association->getProperty();
@@ -74,6 +75,10 @@ class AssociationMerger
         $associatedEntities = $this->entity->get($property);
         if (!is_array($associatedEntities)) {
             throw new AssociationNotLoadedException(sprintf('Association %s is not initialized as an array on Entity', $associationName));
+        }
+
+        if ($prepare !== null) {
+            $data = $prepare($data);
         }
 
         $associated = new Collection($associatedEntities);
