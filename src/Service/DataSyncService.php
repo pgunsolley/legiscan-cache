@@ -362,5 +362,9 @@ class DataSyncService
                 );
             }            
         }
+
+        $table->saveOrFail($entity, [
+            'associated' => $associatedConfig,
+        ]);
     }
 }
