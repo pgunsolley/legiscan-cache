@@ -12,7 +12,6 @@ use Cake\Collection\CollectionInterface;
 use Cake\Datasource\EntityInterface;
 use Cake\ORM\Association;
 use Cake\ORM\Locator\LocatorAwareTrait;
-use Cake\ORM\Table;
 use TypeError;
 
 class AssociationMerger
@@ -21,12 +20,10 @@ class AssociationMerger
 
     protected EntityInterface $entity;
 
-    protected Table $table;
-
     public function __construct(EntityInterface $entity)
     {
         $this->entity = $entity;
-        $this->table = $this->fetchTable($entity->getSource());
+        $this->defaultTable = $entity->getSource();
     }
 
     /**
@@ -45,7 +42,7 @@ class AssociationMerger
         ?callable $descend = null,
         ?callable $beforeMerge = null,
     ): EntityInterface {
-        $association = $this->table->getAssociation($associationName);
+        $association = $this->fetchTable()->getAssociation($associationName);
         $property = $association->getProperty();
         $associationType = $association->type();
         if ($associationType !== Association::ONE_TO_ONE) {
@@ -100,7 +97,7 @@ class AssociationMerger
         ?callable $descend = null,
         ?callable $beforeMerge = null,
     ): CollectionInterface {
-        $association = $this->table->getAssociation($associationName);
+        $association = $this->fetchTable()->getAssociation($associationName);
         $property = $association->getProperty();
         $associationType = $association->type();
         if ($associationType !== Association::ONE_TO_MANY) {
