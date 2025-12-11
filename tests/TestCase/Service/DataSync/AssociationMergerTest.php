@@ -14,12 +14,12 @@ use PHPUnit\Framework\TestCase;
 
 class AssociationMergerTest extends TestCase
 {
-    public function testMergeOneToOne_pass_noExistingAssociatedEntity_associatedIsSet(): void
+    public function testMergeOneToOne_noExistingAssociatedEntity_associatedIsSet(): void
     {
         $tableName = 'Foos';
         $associationName = 'Bars';
         $associationPropertyName = 'bar';
-        $stubAssociatedEntity = $this->createMock(Entity::class);
+        $stubAssociatedEntity = $this->createStub(Entity::class);
         $stubAssociatedEntity
             ->method('isNew')
             ->with()
@@ -46,7 +46,7 @@ class AssociationMergerTest extends TestCase
             ->willReturn(Association::ONE_TO_ONE);
         $stubAssociation
             ->method('__call')
-            ->willReturnCallback(fn($methodName, $data) => match ($methodName) {
+            ->willReturnCallback(fn($methodName) => match ($methodName) {
                 'newEmptyEntity' => $stubAssociatedEntity,
                 'patchEntity' => null,
                 default => throw new Exception("Method $methodName not expected"),
@@ -72,6 +72,70 @@ class AssociationMergerTest extends TestCase
             ],
         );
 
-        $this->assertInstanceOf(Entity::class, $res);
+        $this->assertEquals($stubAssociatedEntity, $res);
+    }
+
+    public function testMergeOneToOne_existingAssociatedEntity(): void
+    {
+        $tableName = 'Foos';
+        $associationName = 'Bars';
+        $associationPropertyName = 'bar';
+        $stubAssociatedEntity = $this->createStub(Entity::class);
+        $stubAssociatedEntity
+            ->method('isNew')
+            ->with()
+            ->willReturn(false);
+        $mockEntity = $this->createMock(Entity::class);
+        $mockEntity
+            ->method('getSource')
+            ->with()
+            ->willReturn($tableName);
+        $mockEntity
+            ->method('get')
+            ->with($associationPropertyName)
+            ->willReturn($stubAssociatedEntity);
+        $mockEntity
+            ->expects($this->never())
+            ->method('set');
+        $stubAssociation = $this->createStub(HasMany::class);
+        $stubAssociation
+            ->method('getProperty')
+            ->willReturn($associationPropertyName);
+        $stubAssociation
+            ->method('type')
+            ->willReturn(Association::ONE_TO_ONE);
+        $stubAssociation
+            ->method('__call')
+            ->willReturnCallback(fn($methodName) => match ($methodName) {
+                'patchEntity' => null,
+                default => throw new Exception("Method $methodName not expected"),
+            });
+        $stubTable = $this->createStub(Table::class);
+        $stubTable
+            ->method('getAssociation')
+            ->with($associationName)
+            ->willReturn($stubAssociation);
+        $stubTableLocator = $this->createStub(TableLocator::class);
+        $stubTableLocator
+            ->method('get')
+            ->with($tableName, [])
+            ->willReturn($stubTable);
+
+        $merger = new AssociationMerger($mockEntity);
+        $merger->setTableLocator($stubTableLocator);
+        $res = $merger->mergeOneToOne(
+            associationName: $associationName,
+            data: [
+                'foo' => 'bar',
+                'bar' => 'baz',
+            ],
+        );
+
+        $this->assertEquals($stubAssociatedEntity, $res);
+    }
+
+    public function testMergeOneToOne_descend1Level_noExistingAssociatedEntities(): void
+    {
+        $this->markTestIncomplete();
     }
 }
