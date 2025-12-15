@@ -7,6 +7,7 @@ namespace App\Service;
 use App\Model\Entity\AmendmentRecord;
 use App\Model\Entity\BillRecord;
 use App\Model\Entity\BillTextRecord;
+use App\Model\Entity\SupplementRecord;
 use App\Model\Enum\BillRecordSponsorLinkType;
 use App\Service\DataSync\AssociationMerger;
 use App\Service\DataSync\EntityCheckerInterface;
@@ -392,7 +393,7 @@ class DataSyncService
     public function syncAmendment(int $amendmentId, EntityCheckerInterface $checker): AmendmentRecord
     {
         /** @var \App\Model\Table\AmendmentRecordsTable $table */
-        $table = $this->fetchTable('BillTextRecords');
+        $table = $this->fetchTable('AmendmentRecords');
         /** @var \App\Model\Entity\AmendmentRecord */
         $entity = $table->find()->where(['amendment_id' => $amendmentId])->first() ?? $table->newEmptyEntity();
 
@@ -415,6 +416,37 @@ class DataSyncService
         $entity->set('last_sync', Date::now());
         if (!$entity->isNew() && $entity->get('amendment_hash') !== $amendment['amendment_hash']) {
             $table->patchEntity($entity, $amendment);
+        }
+
+        return $table->saveOrFail($entity);
+    }
+
+    public function syncSupplement(int $supplementId, EntityCheckerInterface $checker): SupplementRecord
+    {
+        /** @var \App\Model\Table\SupplementRecordsTable $table */
+        $table = $this->fetchTable('SupplementRecords');
+        /** @var \App\Model\Entity\SupplementRecord */
+        $entity = $table->find()->where(['supplement_id' => $supplementId])->first() ?? $table->newEmptyEntity();
+
+        try {
+            if (!$checker->isEntityExpired($entity)) {
+                return $entity;
+            }
+        } catch (TypeError $e) {
+            if (!$entity->isNew()) {
+                throw $e;
+            }
+        }
+
+        $apiResponseBody = $this->legiscanApiService->getSupplement($supplementId);
+        if (!array_key_exists('supplement', $apiResponseBody)) {
+            throw new InvalidResponseBodyException("getSupplement response body missing key 'supplement'");
+        }
+
+        $supplement = $apiResponseBody['supplement'];
+        $entity->set('last_sync', Date::now());
+        if (!$entity->isNew() && $entity->get('supplement_hash') !== $supplement['supplement_hash']) {
+            $table->patchEntity($entity, $supplement);
         }
 
         return $table->saveOrFail($entity);
