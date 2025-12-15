@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Model\Entity\AmendmentRecord;
 use App\Model\Entity\BillRecord;
 use App\Model\Entity\BillTextRecord;
 use App\Model\Enum\BillRecordSponsorLinkType;
@@ -383,6 +384,37 @@ class DataSyncService
         $entity->set('last_sync', Date::now());
         if (!$entity->isNew() && $entity->get('text_hash') !== $text['text_hash']) {
             $table->patchEntity($entity, $text);
+        }
+
+        return $table->saveOrFail($entity);
+    }
+
+    public function syncAmendment(int $amendmentId, EntityCheckerInterface $checker): AmendmentRecord
+    {
+        /** @var \App\Model\Table\AmendmentRecordsTable $table */
+        $table = $this->fetchTable('BillTextRecords');
+        /** @var \App\Model\Entity\AmendmentRecord */
+        $entity = $table->find()->where(['amendment_id' => $amendmentId])->first() ?? $table->newEmptyEntity();
+
+        try {
+            if (!$checker->isEntityExpired($entity)) {
+                return $entity;
+            }
+        } catch (TypeError $e) {
+            if (!$entity->isNew()) {
+                throw $e;
+            }
+        }
+
+        $apiResponseBody = $this->legiscanApiService->getAmendment($amendmentId);
+        if (!array_key_exists('amendment', $apiResponseBody)) {
+            throw new InvalidResponseBodyException("getAmendment response body missing key 'amendment'");
+        }
+
+        $amendment = $apiResponseBody['amendment'];
+        $entity->set('last_sync', Date::now());
+        if (!$entity->isNew() && $entity->get('amendment_hash') !== $amendment['amendment_hash']) {
+            $table->patchEntity($entity, $amendment);
         }
 
         return $table->saveOrFail($entity);
