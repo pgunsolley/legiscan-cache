@@ -16,7 +16,12 @@ declare(strict_types=1);
  */
 namespace App\Controller;
 
+use App\Service\DataSync\ResultSetChecker\AllOrNothing;
+use App\Service\DataSyncService;
+use App\Utility\StateAbbreviation;
 use Cake\Controller\Controller;
+use Cake\Http\Exception\BadRequestException;
+use ValueError;
 
 /**
  * Application Controller
@@ -28,25 +33,24 @@ use Cake\Controller\Controller;
  */
 class AppController extends Controller
 {
-    /**
-     * Initialization hook method.
-     *
-     * Use this method to add common initialization code like loading components.
-     *
-     * e.g. `$this->loadComponent('FormProtection');`
-     *
-     * @return void
-     */
-    public function initialize(): void
+    public function getSyncData(DataSyncService $dataSyncService)
     {
-        parent::initialize();
+        $request = $this->getRequest();
+        $op = $request->getQuery('op');
+        $allOrNothingStrategy = new AllOrNothing();
 
-        $this->loadComponent('Flash');
+        switch ($op) {
+            case 'getSessionList':
+                try {
+                    $stateAbbr = StateAbbreviation::from($request->getQuery('state'));
+                } catch (ValueError $e) {
+                    throw new BadRequestException('"state" query param is not valid');
+                }
 
-        /*
-         * Enable the following component for recommended CakePHP form protection settings.
-         * see https://book.cakephp.org/5/en/controllers/components/form-protection.html
-         */
-        //$this->loadComponent('FormProtection');
+                $sessionListRecords = $dataSyncService->syncSessionList($stateAbbr, $allOrNothingStrategy);
+                // TODO: Build view
+                
+                break;
+        }
     }
 }
