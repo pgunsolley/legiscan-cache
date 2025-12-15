@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Model\Entity\BillRecord;
 use App\Model\Enum\BillRecordSponsorLinkType;
 use App\Service\DataSync\AssociationMerger;
 use App\Service\DataSync\EntityCheckerInterface;
@@ -11,6 +12,7 @@ use App\Service\DataSync\Exception\InvalidResponseBodyException;
 use App\Service\DataSync\ResultSetCheckerInterface;
 use App\Utility\StateAbbreviation;
 use Cake\Collection\CollectionInterface;
+use Cake\Datasource\ResultSetInterface;
 use Cake\I18n\Date;
 use Cake\ORM\Locator\LocatorAwareTrait;
 use TypeError;
@@ -26,12 +28,12 @@ class DataSyncService
         $this->legiscanApiService = $legiscanApiService;
     }
 
-    public function syncSessionList(StateAbbreviation $state, ResultSetCheckerInterface $checker): array
+    public function syncSessionList(StateAbbreviation $state, ResultSetCheckerInterface $checker): ResultSetInterface
     {
         $table = $this->fetchTable('SessionListRecords');
         $entities = $table->find('byStateAbbreviation', stateAbbreviation: $state)->all();
         if (!$checker->isSetExpired($entities)) {
-            return [];
+            return $entities;
         }
 
         $apiResponseBody = $this->legiscanApiService->getSessionList($state->value);
@@ -68,12 +70,12 @@ class DataSyncService
         return $table->saveManyOrFail($entitiesToSave);
     }
 
-    public function syncMasterList(int $sessionId, ResultSetCheckerInterface $checker): array
+    public function syncMasterList(int $sessionId, ResultSetCheckerInterface $checker): ResultSetInterface
     {
         $table = $this->fetchTable('MasterListRecords');
         $entities = $table->find('bySessionId', sessionId: $sessionId)->all();
         if (!$checker->isSetExpired($entities)) {
-            return [];
+            return $entities;
         }
 
         $apiResponseBody = $this->legiscanApiService->getMasterList($sessionId);
@@ -107,7 +109,7 @@ class DataSyncService
         return $table->saveManyOrFail($entitiesToSave);
     }
 
-    public function syncBill(int $billId, EntityCheckerInterface $checker)
+    public function syncBill(int $billId, EntityCheckerInterface $checker): BillRecord
     {
         $associatedConfig = [
             'BillRecordAmendments',
