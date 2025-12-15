@@ -55,12 +55,7 @@ class DataSyncService
             ]) ?? $table->newEntity($sessionListItem);
 
             $entity->set('last_sync', $syncDate);
-            if ($entity->isNew()) {
-                $entitiesToSave[] = $entity;
-                continue;
-            }
-
-            if ($entity->get('session_hash') !== $sessionListItem['session_hash']) {
+            if (!$entity->isNew() && $entity->get('session_hash') !== $sessionListItem['session_hash']) {
                 $table->patchEntity($entity, $sessionListItem);
             }
 
@@ -84,6 +79,7 @@ class DataSyncService
         }
 
         $masterList = $apiResponseBody['masterlist'];
+        unset($masterList['session']);
         $syncDate = Date::now();
         $entitiesToSave = [];
         foreach ($masterList as $masterListItem) {
@@ -95,11 +91,8 @@ class DataSyncService
 
             $entity->set('last_sync', $syncDate);
             if ($entity->isNew()) {
-                $entitiesToSave[] = $entity;
-                continue;
-            }
-
-            if ($entity->get('change_hash') !== $masterListItem['change_hash']) {
+                $entity->set('session_id', $sessionId);
+            } else if ($entity->get('change_hash') !== $masterListItem['change_hash']) {
                 $table->patchEntity($entity, $masterListItem);
             }
 
