@@ -16,6 +16,8 @@ declare(strict_types=1);
  */
 namespace App;
 
+use App\Service\DataSyncService;
+use App\Service\LegiscanApiService;
 use Cake\Core\Configure;
 use Cake\Core\ContainerInterface;
 use Cake\Datasource\FactoryLocator;
@@ -27,6 +29,7 @@ use Cake\Http\MiddlewareQueue;
 use Cake\ORM\Locator\TableLocator;
 use Cake\Routing\Middleware\AssetMiddleware;
 use Cake\Routing\Middleware\RoutingMiddleware;
+use League\Container\Argument\Literal\StringArgument;
 
 /**
  * Application setup class.
@@ -101,5 +104,12 @@ class Application extends BaseApplication
      */
     public function services(ContainerInterface $container): void
     {
+        $container->add('legiscanApiKey', new StringArgument(Configure::read('Integrations.legiscan.key')));
+        $container
+            ->add(LegiscanApiService::class)
+            ->addArgument('legiscanApiKey');
+        $container
+            ->add(DataSyncService::class)
+            ->addArgument(LegiscanApiService::class);
     }
 }

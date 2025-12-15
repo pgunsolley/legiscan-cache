@@ -94,4 +94,13 @@ return [
             'url' => env('EMAIL_TRANSPORT_DEFAULT_URL', null),
         ],
     ],
+
+    /*
+     * Config for 3rd party service integrations 
+     */
+    'Integrations' => [
+        'legiscan' => [
+            'key' => '',
+        ],
+    ],
 ];
