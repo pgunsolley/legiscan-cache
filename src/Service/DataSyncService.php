@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Model\Entity\BillRecord;
+use App\Model\Entity\BillTextRecord;
 use App\Model\Enum\BillRecordSponsorLinkType;
 use App\Service\DataSync\AssociationMerger;
 use App\Service\DataSync\EntityCheckerInterface;
@@ -354,5 +355,36 @@ class DataSyncService
         return $table->saveOrFail($entity, [
             'associated' => $associatedConfig,
         ]);
+    }
+
+    public function syncBillText(int $docId, EntityCheckerInterface $checker): BillTextRecord
+    {
+        /** @var \App\Model\Table\BillTextRecordsTable $table */
+        $table = $this->fetchTable('BillTextRecords');
+        /** @var \App\Model\Entity\BillTextRecord */
+        $entity = $table->find()->where(['doc_id' => $docId])->first() ?? $table->newEmptyEntity();
+
+        try {
+            if (!$checker->isEntityExpired($entity)) {
+                return $entity;
+            }
+        } catch (TypeError $e) {
+            if (!$entity->isNew()) {
+                throw $e;
+            }
+        }
+
+        $apiResponseBody = $this->legiscanApiService->getBillText($docId);
+        if (!array_key_exists('text', $apiResponseBody)) {
+            throw new InvalidResponseBodyException("getBillText response body missing key 'text'");
+        }
+
+        $text = $apiResponseBody['text'];
+        $entity->set('last_sync', Date::now());
+        if (!$entity->isNew() && $entity->get('text_hash') !== $text['text_hash']) {
+            $table->patchEntity($entity, $text);
+        }
+
+        return $table->saveOrFail($entity);
     }
 }
