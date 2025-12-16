@@ -23,6 +23,7 @@ use App\Utility\StateAbbreviation;
 use Cake\Controller\Controller;
 use Cake\Http\Exception\BadRequestException;
 use Cake\View\JsonView;
+use Exception;
 use ValueError;
 
 /**
@@ -56,8 +57,7 @@ class AppController extends Controller
                 }
 
                 try {
-                    $sessionListRecords = $dataSyncService->syncSessionList(StateAbbreviation::from($query['state']), new AllOrNothing());
-                    $this->set(compact('sessionListRecords'));
+                    $data = $dataSyncService->syncSessionList(StateAbbreviation::from($query['state']), new AllOrNothing());
                 } catch (ValueError) {
                     throw new BadRequestException('Invalid value for state');
                 }
@@ -68,8 +68,7 @@ class AppController extends Controller
                     throw new BadRequestException('Missing required query: id');
                 }
 
-                $masterListRecords = $dataSyncService->syncMasterList($query['id'], new AllOrNothing());
-                $this->set(compact('masterListRecords'));
+                $data = $dataSyncService->syncMasterList($query['id'], new AllOrNothing());
                 break;
             
             case 'getBill':
@@ -77,8 +76,7 @@ class AppController extends Controller
                     throw new BadRequestException('Missing required query: id');
                 }
 
-                $billRecord = $dataSyncService->syncBill($query['id'], new EntityChecker());
-                $this->set(compact('billRecord'));
+                $data = $dataSyncService->syncBill($query['id'], new EntityChecker());
                 break;
 
             case 'getBillText':
@@ -86,8 +84,7 @@ class AppController extends Controller
                     throw new BadRequestException('Missing required query: id');
                 }
 
-                $billTextRecord = $dataSyncService->syncBillText($query['id'], new EntityChecker());
-                $this->set(compact('billTextRecord'));
+                $data = $dataSyncService->syncBillText($query['id'], new EntityChecker());
                 break;
 
             case 'getAmendment':
@@ -95,8 +92,7 @@ class AppController extends Controller
                     throw new BadRequestException('Missing required query: id');
                 }
 
-                $amendmentRecord = $dataSyncService->syncAmendment($query['id'], new EntityChecker());
-                $this->set(compact('amendmentRecord'));
+                $data = $dataSyncService->syncAmendment($query['id'], new EntityChecker());
                 break;
 
             case 'getSupplement':
@@ -104,12 +100,18 @@ class AppController extends Controller
                     throw new BadRequestException('Missing required query: id');
                 }
 
-                $supplementRecord = $dataSyncService->syncSupplement($query['id'], new EntityChecker());
-                $this->set(compact('supplementRecord'));
+                $data = $dataSyncService->syncSupplement($query['id'], new EntityChecker());
                 break;
 
             default:
                 throw new BadRequestException('Invalid operation');
         }
+
+        if (!isset($data)) {
+            throw new Exception('$data var is not set');
+        }
+
+        $this->set(compact('data'));
+        $this->viewBuilder()->setOption('serialize', 'data');
     }
 }
