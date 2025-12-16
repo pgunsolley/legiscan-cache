@@ -69,11 +69,11 @@ class SessionListRecordsTable extends Table
             ->allowEmptyString('state_abbr');
 
         $validator
-            ->date('year_start')
+            ->integer('year_start')
             ->allowEmptyDate('year_start');
 
         $validator
-            ->date('year_end')
+            ->integer('year_end')
             ->allowEmptyDate('year_end');
 
         $validator

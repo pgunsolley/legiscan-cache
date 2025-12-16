@@ -34,11 +34,11 @@ class CreateSessionListRecords extends BaseMigration
                 'null' => true,
                 'limit' => 2,
             ])
-            ->addColumn('year_start', 'date', [
+            ->addColumn('year_start', 'integer', [
                 'default' => null,
                 'null' => true,
             ])
-            ->addColumn('year_end', 'date', [
+            ->addColumn('year_end', 'integer', [
                 'default' => null,
                 'null' => true,
             ])

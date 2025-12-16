@@ -68,7 +68,7 @@ class AppController extends Controller
                     throw new BadRequestException('Missing required query: id');
                 }
 
-                $data = $dataSyncService->syncMasterList($query['id'], new AllOrNothing());
+                $data = $dataSyncService->syncMasterList((int)$query['id'], new AllOrNothing());
                 break;
             
             case 'getBill':
@@ -76,7 +76,7 @@ class AppController extends Controller
                     throw new BadRequestException('Missing required query: id');
                 }
 
-                $data = $dataSyncService->syncBill($query['id'], new EntityChecker());
+                $data = $dataSyncService->syncBill((int)$query['id'], new EntityChecker());
                 break;
 
             case 'getBillText':
@@ -84,7 +84,7 @@ class AppController extends Controller
                     throw new BadRequestException('Missing required query: id');
                 }
 
-                $data = $dataSyncService->syncBillText($query['id'], new EntityChecker());
+                $data = $dataSyncService->syncBillText((int)$query['id'], new EntityChecker());
                 break;
 
             case 'getAmendment':
@@ -92,7 +92,7 @@ class AppController extends Controller
                     throw new BadRequestException('Missing required query: id');
                 }
 
-                $data = $dataSyncService->syncAmendment($query['id'], new EntityChecker());
+                $data = $dataSyncService->syncAmendment((int)$query['id'], new EntityChecker());
                 break;
 
             case 'getSupplement':
@@ -100,7 +100,7 @@ class AppController extends Controller
                     throw new BadRequestException('Missing required query: id');
                 }
 
-                $data = $dataSyncService->syncSupplement($query['id'], new EntityChecker());
+                $data = $dataSyncService->syncSupplement((int)$query['id'], new EntityChecker());
                 break;
 
             default:

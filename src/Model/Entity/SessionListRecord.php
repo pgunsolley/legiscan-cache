@@ -12,8 +12,8 @@ use Cake\ORM\Entity;
  * @property int|null $session_id
  * @property int|null $state_id
  * @property string|null $state_abbr
- * @property \Cake\I18n\Date|null $year_start
- * @property \Cake\I18n\Date|null $year_end
+ * @property int|null $year_start
+ * @property int|null $year_end
  * @property int|null $prefile
  * @property int|null $sine_die
  * @property int|null $prior

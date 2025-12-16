@@ -18,6 +18,7 @@ use Cake\Collection\CollectionInterface;
 use Cake\Datasource\ResultSetInterface;
 use Cake\I18n\Date;
 use Cake\ORM\Locator\LocatorAwareTrait;
+use Iterator;
 use TypeError;
 
 class DataSyncService
@@ -31,7 +32,7 @@ class DataSyncService
         $this->legiscanApiService = $legiscanApiService;
     }
 
-    public function syncSessionList(StateAbbreviation $state, ResultSetCheckerInterface $checker): ResultSetInterface
+    public function syncSessionList(StateAbbreviation $state, ResultSetCheckerInterface $checker): iterable
     {
         $table = $this->fetchTable('SessionListRecords');
         $entities = $table->find('byStateAbbreviation', stateAbbreviation: $state)->all();
@@ -68,7 +69,7 @@ class DataSyncService
         return $table->saveManyOrFail($entitiesToSave);
     }
 
-    public function syncMasterList(int $sessionId, ResultSetCheckerInterface $checker): ResultSetInterface
+    public function syncMasterList(int $sessionId, ResultSetCheckerInterface $checker): iterable
     {
         $table = $this->fetchTable('MasterListRecords');
         $entities = $table->find('bySessionId', sessionId: $sessionId)->all();
@@ -150,7 +151,7 @@ class DataSyncService
         $entity->set('last_sync', Date::now());
         $associationMerger = new AssociationMerger($entity);
         $bill = $apiResponseBody['bill'];
-        if ($bill->get('change_hash') !== $bill['change_hash']) {
+        if ($entity->get('change_hash') !== $bill['change_hash']) {
             if (array_key_exists('session', $bill)) {
                 $associationMerger->mergeOneToOne(
                     associationName: 'BillRecordSessions',
