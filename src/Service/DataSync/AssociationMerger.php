@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace App\Service\DataSync;
 
-use App\Service\DataSync\Exception\AssociationNotLoadedException;
 use App\Service\DataSync\Exception\InvalidAssociationDataException;
 use App\Service\DataSync\Exception\InvalidAssociationTypeException;
 use App\Service\DataSync\Exception\InvalidMatchException;
@@ -97,6 +96,7 @@ class AssociationMerger
         ?callable $descend = null,
         ?callable $beforeMerge = null,
     ): CollectionInterface {
+        // FIXME: Entities aren't being added to $entity->$propety array; also found possible performance optimization
         $association = $this->fetchTable()->getAssociation($associationName);
         $property = $association->getProperty();
         $associationType = $association->type();
@@ -110,10 +110,8 @@ class AssociationMerger
 
         $associatedEntities = $this->entity->get($property);
         if (!is_array($associatedEntities)) {
-            throw new AssociationNotLoadedException(sprintf(
-                'Association %s is not initialized as an array on Entity',
-                $associationName,
-            ));
+            $this->entity->set($property, []);
+            $associatedEntities = $this->entity->get($property);
         }
 
         if ($prepare !== null) {
