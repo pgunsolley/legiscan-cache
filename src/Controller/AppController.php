@@ -16,11 +16,13 @@ declare(strict_types=1);
  */
 namespace App\Controller;
 
+use App\Service\DataSync\EntityChecker;
 use App\Service\DataSync\ResultSetChecker\AllOrNothing;
 use App\Service\DataSyncService;
 use App\Utility\StateAbbreviation;
 use Cake\Controller\Controller;
 use Cake\Http\Exception\BadRequestException;
+use Cake\View\JsonView;
 use ValueError;
 
 /**
@@ -33,24 +35,81 @@ use ValueError;
  */
 class AppController extends Controller
 {
+    public function viewClasses(): array
+    {
+        return [JsonView::class];
+    }
+
     public function getSyncData(DataSyncService $dataSyncService)
     {
-        $request = $this->getRequest();
-        $op = $request->getQuery('op');
-        $allOrNothingStrategy = new AllOrNothing();
+        $req = $this->getRequest();
+        $query = $req->getQuery();
 
-        switch ($op) {
+        if (!array_key_exists('op', $query)) {
+            throw new BadRequestException('Missing required query: op');
+        }
+
+        switch ($query['op']) {
             case 'getSessionList':
-                try {
-                    $stateAbbr = StateAbbreviation::from($request->getQuery('state'));
-                } catch (ValueError $e) {
-                    throw new BadRequestException('"state" query param is not valid');
+                if (!array_key_exists('state', $query)) {
+                    throw new BadRequestException('Missing required query: state');
                 }
 
-                $sessionListRecords = $dataSyncService->syncSessionList($stateAbbr, $allOrNothingStrategy);
-                // TODO: Build view
-                
+                try {
+                    $sessionListRecords = $dataSyncService->syncSessionList(StateAbbreviation::from($query['state']), new AllOrNothing());
+                    $this->set(compact('sessionListRecords'));
+                } catch (ValueError) {
+                    throw new BadRequestException('Invalid value for state');
+                }
                 break;
+
+            case 'getMasterList':
+                if (!array_key_exists('id', $query)) {
+                    throw new BadRequestException('Missing required query: id');
+                }
+
+                $masterListRecords = $dataSyncService->syncMasterList($query['id'], new AllOrNothing());
+                $this->set(compact('masterListRecords'));
+                break;
+            
+            case 'getBill':
+                if (!array_key_exists('id', $query)) {
+                    throw new BadRequestException('Missing required query: id');
+                }
+
+                $billRecord = $dataSyncService->syncBill($query['id'], new EntityChecker());
+                $this->set(compact('billRecord'));
+                break;
+
+            case 'getBillText':
+                if (!array_key_exists('id', $query)) {
+                    throw new BadRequestException('Missing required query: id');
+                }
+
+                $billTextRecord = $dataSyncService->syncBillText($query['id'], new EntityChecker());
+                $this->set(compact('billTextRecord'));
+                break;
+
+            case 'getAmendment':
+                if (!array_key_exists('id', $query)) {
+                    throw new BadRequestException('Missing required query: id');
+                }
+
+                $amendmentRecord = $dataSyncService->syncAmendment($query['id'], new EntityChecker());
+                $this->set(compact('amendmentRecord'));
+                break;
+
+            case 'getSupplement':
+                if (!array_key_exists('id', $query)) {
+                    throw new BadRequestException('Missing required query: id');
+                }
+
+                $supplementRecord = $dataSyncService->syncSupplement($query['id'], new EntityChecker());
+                $this->set(compact('supplementRecord'));
+                break;
+
+            default:
+                throw new BadRequestException('Invalid operation');
         }
     }
 }
