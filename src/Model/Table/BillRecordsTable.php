@@ -61,42 +61,55 @@ class BillRecordsTable extends Table
 
         $this->hasMany('BillRecordAmendments', [
             'foreignKey' => 'bill_record_id',
+            'dependent' => true,
         ]);
         $this->hasMany('BillRecordCalendars', [
             'foreignKey' => 'bill_record_id',
+            'dependent' => true,
         ]);
         $this->hasMany('BillRecordCommittees', [
             'foreignKey' => 'bill_record_id',
+            'dependent' => true,
         ]);
         $this->hasMany('BillRecordHistories', [
             'foreignKey' => 'bill_record_id',
+            'dependent' => true,
         ]);
         $this->hasMany('BillRecordProgresses', [
             'foreignKey' => 'bill_record_id',
+            'dependent' => true,
         ]);
         $this->hasMany('BillRecordReferrals', [
             'foreignKey' => 'bill_record_id',
+            'dependent' => true,
         ]);
         $this->hasMany('BillRecordSasts', [
             'foreignKey' => 'bill_record_id',
+            'dependent' => true,
         ]);
         $this->hasOne('BillRecordSessions', [
             'foreignKey' => 'bill_record_id',
+            'dependent' => true,
         ]);
         $this->hasMany('BillRecordSponsors', [
             'foreignKey' => 'bill_record_id',
+            'dependent' => true,
         ]);
         $this->hasMany('BillRecordSubjects', [
             'foreignKey' => 'bill_record_id',
+            'dependent' => true,
         ]);
         $this->hasMany('BillRecordSupplements', [
             'foreignKey' => 'bill_record_id',
+            'dependent' => true,
         ]);
         $this->hasMany('BillRecordTexts', [
             'foreignKey' => 'bill_record_id',
+            'dependent' => true,
         ]);
         $this->hasMany('BillRecordVotes', [
             'foreignKey' => 'bill_record_id',
+            'dependent' => true,
         ]);
     }
 
