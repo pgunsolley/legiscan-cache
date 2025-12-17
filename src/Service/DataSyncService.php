@@ -155,6 +155,7 @@ class DataSyncService
                     associationName: 'BillRecordSessions',
                     data: $bill['session'],
                 );
+                unset($bill['session']);
             }
 
             if (array_key_exists('progress', $bill)) {
@@ -166,6 +167,7 @@ class DataSyncService
                         'event' => $item['event'],
                     ]),
                 );
+                unset($bill['progress']);
             }
 
             if (array_key_exists('committee', $bill)) {
@@ -178,6 +180,7 @@ class DataSyncService
                         'name' => $item['name'],
                     ]),
                 );
+                unset($bill['committee']);
             }
 
             if (array_key_exists('referrals', $bill)) {
@@ -191,6 +194,7 @@ class DataSyncService
                         'name' => $item['name'],
                     ]),
                 );
+                unset($bill['referrals']);
             }
 
             if (array_key_exists('history', $bill)) {
@@ -203,6 +207,7 @@ class DataSyncService
                         'action' => $item['action'],
                     ]),
                 );
+                unset($bill['history']);
             }
 
             if (array_key_exists('sponsors', $bill)) {
@@ -264,6 +269,7 @@ class DataSyncService
                         return $item;
                     },
                 );
+                unset($bill['sponsors']);
             }
 
             if (array_key_exists('sasts', $bill)) {
@@ -276,6 +282,7 @@ class DataSyncService
                         'sast_bill_id' => $item['sast_bill_id'],
                     ]),
                 );
+                unset($bill['sasts']);
             }
 
             if (array_key_exists('subjects', $bill)) {
@@ -287,6 +294,7 @@ class DataSyncService
                         'subject_name' => $item['subject_name'],
                     ]),
                 );
+                unset($bill['subjects']);
             }
 
             if (array_key_exists('texts', $bill)) {
@@ -299,6 +307,7 @@ class DataSyncService
                         'type_id' => $item['type_id'],
                     ]),
                 );
+                unset($bill['texts']);
             }
 
             if (array_key_exists('votes', $bill)) {
@@ -311,6 +320,7 @@ class DataSyncService
                         'date' => $item['date'],
                     ]),
                 );
+                unset($bill['votes']);
             }
 
             if (array_key_exists('amendments', $bill)) {
@@ -324,6 +334,7 @@ class DataSyncService
                         'title' => $item['title'],
                     ]),
                 );
+                unset($bill['amendments']);
             }
 
             if (array_key_exists('supplements', $bill)) {
@@ -337,6 +348,7 @@ class DataSyncService
                         'title' => $item['title'],
                     ]),
                 );
+                unset($bill['supplements']);
             }
 
             if (array_key_exists('calendar', $bill)) {
@@ -350,9 +362,11 @@ class DataSyncService
                         'description' => $item['description'],
                     ]),
                 );
+                unset($bill['calendar']);
             }            
         }
 
+        $table->patchEntity($entity, $bill);
         return $table->saveOrFail($entity, [
             'associated' => $associatedConfig,
         ]);
