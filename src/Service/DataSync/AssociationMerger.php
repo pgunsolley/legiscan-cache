@@ -7,7 +7,6 @@ use App\Service\DataSync\Exception\InvalidAssociationDataException;
 use App\Service\DataSync\Exception\InvalidAssociationTypeException;
 use App\Service\DataSync\Exception\InvalidMatchException;
 use Cake\Collection\Collection;
-use Cake\Collection\CollectionInterface;
 use Cake\Datasource\EntityInterface;
 use Cake\ORM\Association;
 use Cake\ORM\Locator\LocatorAwareTrait;
@@ -95,8 +94,7 @@ class AssociationMerger
         ?callable $prepare = null,
         ?callable $descend = null,
         ?callable $beforeMerge = null,
-    ): CollectionInterface {
-        // FIXME: Entities aren't being added to $entity->$propety array; also found possible performance optimization
+    ): array {
         $association = $this->fetchTable()->getAssociation($associationName);
         $property = $association->getProperty();
         $associationType = $association->type();
@@ -108,12 +106,7 @@ class AssociationMerger
             ));
         }
 
-        $associatedEntities = $this->entity->get($property);
-        if (!is_array($associatedEntities)) {
-            $this->entity->set($property, []);
-            $associatedEntities = $this->entity->get($property);
-        }
-
+        $associatedEntities = $this->entity->get($property) ?? [];
         if ($prepare !== null) {
             $prepared = $prepare($data);
             if (!is_array($prepared)) {
@@ -124,7 +117,7 @@ class AssociationMerger
         }
 
         $associated = new Collection($associatedEntities);
-        return new Collection(array_map(function ($item) use (
+        array_walk($data, function ($item) use (
             $match,
             $beforeMerge,
             $association,
@@ -160,11 +153,15 @@ class AssociationMerger
             }
 
             $association->patchEntity($matched, $item);
+
             if ($matched->isNew()) {
                 $associatedEntities[] = $matched;
             }
 
             return $matched;
-        }, $data));
+        });
+
+        $this->entity->set($property, $associatedEntities);
+        return $associatedEntities;
     }
 }

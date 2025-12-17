@@ -70,8 +70,7 @@ class BillRecordSponsorLinksTable extends Table
             ->notEmptyString('bill_record_sponsor_id');
 
         $validator
-            ->scalar('bill_record_sponsor_link_type')
-            ->maxLength('bill_record_sponsor_link_type', 255)
+            ->enum('bill_record_sponsor_link_type', BillRecordSponsorLinkType::class)
             ->requirePresence('bill_record_sponsor_link_type', 'create')
             ->notEmptyString('bill_record_sponsor_link_type');
 
