@@ -15,6 +15,7 @@ use App\Service\DataSync\Exception\InvalidResponseBodyException;
 use App\Service\DataSync\ResultSetCheckerInterface;
 use App\Utility\StateAbbreviation;
 use Cake\Collection\CollectionInterface;
+use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\I18n\Date;
 use Cake\ORM\Locator\LocatorAwareTrait;
 use TypeError;
@@ -28,6 +29,51 @@ class DataSyncService
     public function __construct(LegiscanApiService $legiscanApiService)
     {
         $this->legiscanApiService = $legiscanApiService;
+    }
+
+    protected function sessionIdExists(int $sessionId)
+    {
+        return $this
+            ->fetchTable('SessionListRecords')
+            ->find()
+            ->where(['session_id' => $sessionId])
+            ->count() > 0;
+    }
+
+    protected function billIdExists(int $billId)
+    {
+        return $this
+            ->fetchTable('MasterListRecords')
+            ->find()
+            ->where(['bill_id' => $billId])
+            ->count() > 0;
+    }
+
+    protected function docIdExists(int $docId)
+    {
+        return $this
+            ->fetchTable('BillRecordTexts')
+            ->find()
+            ->where(['doc_id' => $docId])
+            ->count() > 0;
+    }
+
+    protected function amendmentIdExists(int $amendmentId)
+    {
+        return $this
+            ->fetchTable('BillRecordAmendments')
+            ->find()
+            ->where(['amendment_id' => $amendmentId])
+            ->count() > 0;
+    }
+
+    protected function supplementIdExists(int $supplementId)
+    {
+        return $this
+            ->fetchTable('BillRecordSupplements')
+            ->find()
+            ->where(['supplement_id' => $supplementId])
+            ->count() > 0;
     }
 
     public function syncSessionList(StateAbbreviation $state, ResultSetCheckerInterface $checker): iterable
@@ -69,6 +115,10 @@ class DataSyncService
 
     public function syncMasterList(int $sessionId, ResultSetCheckerInterface $checker): iterable
     {
+        if (!$this->sessionIdExists($sessionId)) {
+            throw new RecordNotFoundException();
+        }
+
         $table = $this->fetchTable('MasterListRecords');
         $entities = $table->find('bySessionId', sessionId: $sessionId)->all();
         if (!$checker->isSetExpired($entities)) {
@@ -106,6 +156,10 @@ class DataSyncService
 
     public function syncBill(int $billId, EntityCheckerInterface $checker): BillRecord
     {
+        if (!$this->billIdExists($billId)) {
+            throw new RecordNotFoundException();
+        }
+
         $associatedConfig = [
             'BillRecordAmendments',
             'BillRecordCalendars',
@@ -374,6 +428,10 @@ class DataSyncService
 
     public function syncBillText(int $docId, EntityCheckerInterface $checker): BillTextRecord
     {
+        if (!$this->docIdExists($docId)) {
+            throw new RecordNotFoundException();
+        }
+
         /** @var \App\Model\Table\BillTextRecordsTable $table */
         $table = $this->fetchTable('BillTextRecords');
         /** @var \App\Model\Entity\BillTextRecord */
@@ -405,6 +463,10 @@ class DataSyncService
 
     public function syncAmendment(int $amendmentId, EntityCheckerInterface $checker): AmendmentRecord
     {
+        if (!$this->amendmentIdExists($amendmentId)) {
+            throw new RecordNotFoundException();
+        }
+
         /** @var \App\Model\Table\AmendmentRecordsTable $table */
         $table = $this->fetchTable('AmendmentRecords');
         /** @var \App\Model\Entity\AmendmentRecord */
@@ -436,6 +498,10 @@ class DataSyncService
 
     public function syncSupplement(int $supplementId, EntityCheckerInterface $checker): SupplementRecord
     {
+        if (!$this->supplementIdExists($supplementId)) {
+            throw new RecordNotFoundException();
+        }
+
         /** @var \App\Model\Table\SupplementRecordsTable $table */
         $table = $this->fetchTable('SupplementRecords');
         /** @var \App\Model\Entity\SupplementRecord */
