@@ -31,5 +31,5 @@ use Cake\Routing\RouteBuilder;
  */
 return function (RouteBuilder $routes): void {
     $routes->setRouteClass(DashedRoute::class);
-    $routes->connect('/', ['controller' => 'App', 'action' => 'getSyncData']);
+    $routes->get('/', ['controller' => 'App', 'action' => 'getSyncData']);
 };
