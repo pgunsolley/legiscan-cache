@@ -33,7 +33,7 @@ class LegiscanApiService
             'state' => $state,
         ]);
 
-        return $res->getJson();
+        return $res->getJson() ?? [];
     }
 
     public function getMasterList(int $sessionId): array
@@ -44,7 +44,7 @@ class LegiscanApiService
             'id' => $sessionId,
         ]);
 
-        return $res->getJson();
+        return $res->getJson() ?? [];
     }
 
     public function getBill(int $billId): array
@@ -55,7 +55,7 @@ class LegiscanApiService
             'id' => $billId,
         ]);
 
-        return $res->getJson();
+        return $res->getJson() ?? [];
     }
 
     public function getBillText(int $docId): array
@@ -66,7 +66,7 @@ class LegiscanApiService
             'id' => $docId,
         ]);
 
-        return $res->getJson();
+        return $res->getJson() ?? [];
     }
 
     public function getAmendment(int $amendmentId): array
@@ -77,7 +77,7 @@ class LegiscanApiService
             'id' => $amendmentId,
         ]);
 
-        return $res->getJson();
+        return $res->getJson() ?? [];
     }
 
     public function getSupplement(int $supplementId): array
@@ -88,6 +88,6 @@ class LegiscanApiService
             'id' => $supplementId,
         ]);
 
-        return $res->getJson();
+        return $res->getJson() ?? [];
     }
 }
