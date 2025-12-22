@@ -25,7 +25,7 @@ class CreateMasterListRecords extends BaseMigration
             ])
             ->addColumn('bill_id', 'integer', [
                 'default' => null,
-                'null' => true,
+                'null' => false,
                 'signed' => false,
             ])
             ->addColumn('number', 'string', [
@@ -71,6 +71,13 @@ class CreateMasterListRecords extends BaseMigration
             ->addColumn('last_sync', 'date', [
                 'default' => null,
                 'null' => false,
+            ])
+            ->addIndex('bill_id', [
+                'unique' => true,
+            ])
+            ->addForeignKey('session_id', 'session_list_records', 'session_id', [
+                'update' => 'NO_ACTION',
+                'delete' => 'CASCADE',
             ])
             ->create();
     }

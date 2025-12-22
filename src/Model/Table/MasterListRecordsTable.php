@@ -55,6 +55,10 @@ class MasterListRecordsTable extends Table
     public function validationDefault(Validator $validator): Validator
     {
         $validator
+            ->integer('session_id')
+            ->requirePresence('session_id');
+
+        $validator
             ->nonNegativeInteger('bill_id')
             ->allowEmptyString('bill_id');
 
@@ -110,7 +114,7 @@ class MasterListRecordsTable extends Table
 
     public function buildRules(RulesChecker $rules): RulesChecker
     {
-        $rules->add($rules->isUnique(['bill_id']));
+        $rules->add($rules->isUnique(['session_id', 'bill_id']));
         return $rules;
     }
 

@@ -20,7 +20,7 @@ class CreateSessionListRecords extends BaseMigration
             ->table('session_list_records')
             ->addColumn('session_id', 'integer', [
                 'default' => null,
-                'null' => true,
+                'null' => false,
                 'signed' => false,
             ])
             ->addColumn('state_id', 'integer', [
@@ -91,6 +91,9 @@ class CreateSessionListRecords extends BaseMigration
             ->addColumn('last_sync', 'date', [
                 'default' => null,
                 'null' => false,
+            ])
+            ->addIndex('session_id', [
+                'unique' => true,
             ])
             ->create();
     }

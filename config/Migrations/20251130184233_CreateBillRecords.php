@@ -119,6 +119,9 @@ class CreateBillRecords extends BaseMigration
                 'default' => null,
                 'null' => false,
             ])
+            ->addIndex('bill_id', [
+                'unique' => true,
+            ])
             ->create();
     }
 }
