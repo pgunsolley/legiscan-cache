@@ -160,23 +160,8 @@ class DataSyncService
             throw new RecordNotFoundException();
         }
 
-        $associatedConfig = [
-            'BillRecordAmendments',
-            'BillRecordCalendars',
-            'BillRecordCommittees',
-            'BillRecordHistories',
-            'BillRecordProgresses',
-            'BillRecordReferrals',
-            'BillRecordSasts',
-            'BillRecordSessions',
-            'BillRecordSponsors.BillRecordSponsorSocials',
-            'BillRecordSponsors.BillRecordSponsorCapitolAddresses',
-            'BillRecordSponsors.BillRecordSponsorLinks',
-            'BillRecordSubjects',
-            'BillRecordSupplements',
-            'BillRecordTexts',
-            'BillRecordVotes',
-        ];
+        $associatedConfig = [];
+
         /** @var \App\Model\Table\BillRecordsTable $table */
         $table = $this->fetchTable('BillRecords');
         /** @var \App\Model\Entity\BillRecord $entity */
@@ -201,15 +186,16 @@ class DataSyncService
         }
 
         $entity->set('last_sync', Date::now());
-        $associationMerger = new AssociationMerger($entity);
         $bill = $apiResponseBody['bill'];
         if ($entity->get('change_hash') !== $bill['change_hash']) {
+            $associationMerger = new AssociationMerger($entity);
             if (array_key_exists('session', $bill)) {
                 $associationMerger->mergeOneToOne(
                     associationName: 'BillRecordSessions',
                     data: $bill['session'],
                 );
                 unset($bill['session']);
+                $associatedConfig[] = 'BillRecordSessions';
             }
 
             if (array_key_exists('progress', $bill)) {
@@ -222,6 +208,7 @@ class DataSyncService
                     ]),
                 );
                 unset($bill['progress']);
+                $associatedConfig[] = 'BillRecordProgresses';
             }
 
             if (array_key_exists('committee', $bill)) {
@@ -235,6 +222,7 @@ class DataSyncService
                     ]),
                 );
                 unset($bill['committee']);
+                $associatedConfig[] = 'BillRecordCommittees';
             }
 
             if (array_key_exists('referrals', $bill)) {
@@ -249,6 +237,7 @@ class DataSyncService
                     ]),
                 );
                 unset($bill['referrals']);
+                $associatedConfig[] = 'BillRecordReferrals';
             }
 
             if (array_key_exists('history', $bill)) {
@@ -262,6 +251,7 @@ class DataSyncService
                     ]),
                 );
                 unset($bill['history']);
+                $associatedConfig[] = 'BillRecordHistories';
             }
 
             if (array_key_exists('sponsors', $bill)) {
@@ -273,13 +263,14 @@ class DataSyncService
                         'party_id' => $item['party_id'],
                         'state_id' => $item['state_id'],
                     ]),
-                    descend: static function (AssociationMerger $sponsorMerger, array $item) {
+                    descend: static function (AssociationMerger $sponsorMerger, array $item) use (&$associatedConfig) {
                         if (array_key_exists('bio', $item)) {
                             if (array_key_exists('social', $item['bio'])) {
                                 $sponsorMerger->mergeOneToOne(
                                     associationName: 'BillRecordSponsorSocials',
                                     data: $item['bio']['social'],
                                 );
+                                $associatedConfig[] = 'BillRecordSponsors.BillRecordSponsorSocials';
                             }
 
                             if (array_key_exists('capitol_address', $item['bio'])) {
@@ -287,6 +278,7 @@ class DataSyncService
                                     associationName: 'BillRecordSponsorCapitolAddresses',
                                     data: $item['bio']['capitol_address'],
                                 );
+                                $associatedConfig[] = 'BillRecordSponsors.BillRecordSponsorCapitolAddresses';
                             }
 
                             if (array_key_exists('links', $item['bio'])) {
@@ -315,6 +307,7 @@ class DataSyncService
                                         'bill_record_sponsor_link_type' => $item['bill_record_sponsor_link_type'],
                                     ]),
                                 );
+                                $associatedConfig[] = 'BillRecordSponsors.BillRecordSponsorLinks';
                             }
                         }
                     },
@@ -324,6 +317,7 @@ class DataSyncService
                     },
                 );
                 unset($bill['sponsors']);
+                $associatedConfig[] = 'BillRecordSponsors';
             }
 
             if (array_key_exists('sasts', $bill)) {
@@ -337,6 +331,7 @@ class DataSyncService
                     ]),
                 );
                 unset($bill['sasts']);
+                $associatedConfig[] = 'BillRecordSasts';
             }
 
             if (array_key_exists('subjects', $bill)) {
@@ -349,6 +344,7 @@ class DataSyncService
                     ]),
                 );
                 unset($bill['subjects']);
+                $associatedConfig[] = 'BillRecordSubjects';
             }
 
             if (array_key_exists('texts', $bill)) {
@@ -362,6 +358,7 @@ class DataSyncService
                     ]),
                 );
                 unset($bill['texts']);
+                $associatedConfig[] = 'BillRecordTexts';
             }
 
             if (array_key_exists('votes', $bill)) {
@@ -375,6 +372,7 @@ class DataSyncService
                     ]),
                 );
                 unset($bill['votes']);
+                $associatedConfig[] = 'BillRecordVotes';
             }
 
             if (array_key_exists('amendments', $bill)) {
@@ -389,6 +387,7 @@ class DataSyncService
                     ]),
                 );
                 unset($bill['amendments']);
+                $associatedConfig[] = 'BillRecordAmendments';
             }
 
             if (array_key_exists('supplements', $bill)) {
@@ -403,6 +402,7 @@ class DataSyncService
                     ]),
                 );
                 unset($bill['supplements']);
+                $associatedConfig[] = 'BillRecordSupplements';
             }
 
             if (array_key_exists('calendar', $bill)) {
@@ -417,10 +417,12 @@ class DataSyncService
                     ]),
                 );
                 unset($bill['calendar']);
-            }            
+                $associatedConfig[] = 'BillRecordCalendars';
+            }
+
+            $table->patchEntity($entity, $bill); // FIXME: This line was added before the error, relating to empty last_sync field, appeared
         }
 
-        $table->patchEntity($entity, $bill);
         return $table->saveOrFail($entity, [
             'associated' => $associatedConfig,
         ]);
