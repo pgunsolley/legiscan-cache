@@ -123,6 +123,10 @@ class CreateAmendmentRecords extends BaseMigration
                 'default' => null,
                 'null' => false,
             ])
+            ->addForeignKey('amendment_id', 'bill_record_amendments', 'amendment_id', [
+                'update' => 'NO_ACTION',
+                'delete' => 'CASCADE',
+            ])
             ->create();
     }
 }

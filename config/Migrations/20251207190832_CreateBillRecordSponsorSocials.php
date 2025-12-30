@@ -55,6 +55,10 @@ class CreateBillRecordSponsorSocials extends BaseMigration
             ])
             ->addColumn('created', 'datetime')
             ->addColumn('modified', 'datetime')
+            ->addForeignKey('bill_record_sponsor_id', 'bill_record_sponsors', 'id', [
+                'update' => 'NO_ACTION',
+                'delete' => 'CASCADE',
+            ])
             ->create();
     }
 }

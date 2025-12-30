@@ -43,6 +43,11 @@ class AmendmentRecordsTable extends Table
         $this->setPrimaryKey('id');
 
         $this->addBehavior('Timestamp');
+
+        $this->belongsTo('BillRecordAmendments', [
+            'foreignKey' => 'amendment_id',
+            'bindingKey' => 'amendment_id',
+        ]);
     }
 
     /**

@@ -34,6 +34,7 @@ use Cake\ORM\Entity;
  * @property \Cake\I18n\DateTime $created
  * @property \Cake\I18n\DateTime $modified
  * @property \Cake\I18n\Date $last_sync
+ * @property \App\Model\Entity\BillRecordAmendment $bill_record_amendment
  */
 class AmendmentRecord extends Entity
 {

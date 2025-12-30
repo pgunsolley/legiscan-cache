@@ -44,6 +44,15 @@ class MasterListRecordsTable extends Table
         $this->setPrimaryKey('id');
 
         $this->addBehavior('Timestamp');
+        
+        $this->belongsTo('SessionListRecords', [
+            'foreignKey' => 'session_id',
+            'bindingKey' => 'session_id',
+        ]);
+        $this->hasOne('BillRecords', [
+            'foreignKey' => 'bill_id',
+            'bindingKey' => 'bill_id', 
+        ]);
     }
 
     /**

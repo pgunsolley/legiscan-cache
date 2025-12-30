@@ -118,6 +118,10 @@ class CreateSupplementRecords extends BaseMigration
                 'default' => null,
                 'null' => false,
             ])
+            ->addForeignKey('supplement_id', 'bill_record_supplements', 'supplement_id', [
+                'update' => 'NO_ACTION',
+                'delete' => 'CASCADE',
+            ])
             ->create();
     }
 }

@@ -5,7 +5,6 @@ namespace App\Model\Table;
 
 use App\Model\Enum\BillRecordSponsorLinkType;
 use Cake\Database\Type\EnumType;
-use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;

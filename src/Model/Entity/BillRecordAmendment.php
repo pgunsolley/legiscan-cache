@@ -27,6 +27,7 @@ use Cake\ORM\Entity;
  * @property \Cake\I18n\DateTime $modified
  *
  * @property \App\Model\Entity\BillRecord $bill_record
+ * @property \App\Model\Entity\AmendmentRecord $amendment_record
  */
 class BillRecordAmendment extends Entity
 {

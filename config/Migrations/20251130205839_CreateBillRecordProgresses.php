@@ -34,6 +34,10 @@ class CreateBillRecordProgresses extends BaseMigration
             ])
             ->addColumn('created', 'datetime')
             ->addColumn('modified', 'datetime')
+            ->addForeignKey('bill_record_id', 'bill_records', 'id', [
+                'update' => 'NO_ACTION',
+                'delete' => 'CASCADE',
+            ])
             ->create();
     }
 }

@@ -111,6 +111,10 @@ class BillRecordsTable extends Table
             'foreignKey' => 'bill_record_id',
             'dependent' => true,
         ]);
+        $this->belongsTo('MasterListRecords', [
+            'foreignKey' => 'bill_id',
+            'bindingKey' => 'bill_id',
+        ]);
     }
 
     /**

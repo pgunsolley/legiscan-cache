@@ -122,6 +122,10 @@ class CreateBillRecords extends BaseMigration
             ->addIndex('bill_id', [
                 'unique' => true,
             ])
+            ->addForeignKey('bill_id', 'master_list_records', 'bill_id', [
+                'update' => 'NO_ACTION',
+                'delete' => 'CASCADE',
+            ])
             ->create();
     }
 }

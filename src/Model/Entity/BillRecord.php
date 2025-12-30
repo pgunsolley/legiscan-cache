@@ -46,6 +46,7 @@ use Cake\ORM\Entity;
  * @property \App\Model\Entity\BillRecordSupplement[] $bill_record_supplements
  * @property \App\Model\Entity\BillRecordText[] $bill_record_texts
  * @property \App\Model\Entity\BillRecordVote[] $bill_record_votes
+ * @property \App\Model\Entity\MasterListRecord $master_list_record
  */
 class BillRecord extends Entity
 {

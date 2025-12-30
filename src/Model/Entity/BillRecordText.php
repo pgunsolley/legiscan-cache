@@ -30,6 +30,7 @@ use Cake\ORM\Entity;
  * @property \Cake\I18n\DateTime $modified
  *
  * @property \App\Model\Entity\BillRecord $bill_record
+ * @property \App\Model\Entity\BillTextRecord $bill_text_record
  */
 class BillRecordText extends Entity
 {

@@ -106,6 +106,10 @@ class CreateBillTextRecords extends BaseMigration
                 'default' => null,
                 'null' => false,
             ])
+            ->addForeignKey('doc_id', 'bill_record_texts', 'doc_id', [
+                'update' => 'NO_ACTION',
+                'delete' => 'CASCADE',
+            ])
             ->create();
     }
 }

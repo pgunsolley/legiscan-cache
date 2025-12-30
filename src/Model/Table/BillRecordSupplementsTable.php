@@ -50,6 +50,10 @@ class BillRecordSupplementsTable extends Table
             'foreignKey' => 'bill_record_id',
             'joinType' => 'INNER',
         ]);
+        $this->hasOne('SupplementRecords', [
+            'foreignKey' => 'supplement_id',
+            'bindingKey' => 'supplement_id',
+        ]);
     }
 
     /**

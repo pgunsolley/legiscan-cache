@@ -22,6 +22,7 @@ use Cake\ORM\Entity;
  * @property \Cake\I18n\DateTime $created
  * @property \Cake\I18n\DateTime $modified
  * @property \Cake\I18n\Date $last_sync
+ * @property \App\Model\Entity\SessionListRecord $session_list_record
  */
 class MasterListRecord extends Entity
 {

@@ -50,6 +50,10 @@ class BillRecordTextsTable extends Table
             'foreignKey' => 'bill_record_id',
             'joinType' => 'INNER',
         ]);
+        $this->hasOne('BillTextRecords', [
+            'foreignKey' => 'doc_id',
+            'bindingKey' => 'doc_id',
+        ]);
     }
 
     /**

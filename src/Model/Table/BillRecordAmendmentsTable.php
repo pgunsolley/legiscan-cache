@@ -50,6 +50,10 @@ class BillRecordAmendmentsTable extends Table
             'foreignKey' => 'bill_record_id',
             'joinType' => 'INNER',
         ]);
+        $this->hasOne('AmendmentRecords', [
+            'foreignKey' => 'amendment_id',
+            'bindingKey' => 'amendment_id',
+        ]);
     }
 
     /**
