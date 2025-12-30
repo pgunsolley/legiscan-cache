@@ -50,6 +50,8 @@ class AppController extends Controller
             throw new BadRequestException('Missing required query: op');
         }
 
+        $this->set('op', $query['op']);
+
         switch ($query['op']) {
             case 'getSessionList':
                 if (!array_key_exists('state', $query)) {
@@ -112,6 +114,8 @@ class AppController extends Controller
         }
 
         $this->set(compact('data'));
+
+        // TODO: Replace serialization with standard template rendering workflow to build views consistent with legiscan response data
         $this->viewBuilder()->setOption('serialize', 'data');
     }
 }
