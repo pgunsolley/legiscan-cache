@@ -456,7 +456,7 @@ class DataSyncService
 
         $text = $apiResponseBody['text'];
         $entity->set('last_sync', Date::now());
-        if (!$entity->isNew() && $entity->get('text_hash') !== $text['text_hash']) {
+        if ($entity->isNew() || $entity->get('text_hash') !== $text['text_hash']) {
             $table->patchEntity($entity, $text);
         }
 
@@ -491,7 +491,7 @@ class DataSyncService
 
         $amendment = $apiResponseBody['amendment'];
         $entity->set('last_sync', Date::now());
-        if (!$entity->isNew() && $entity->get('amendment_hash') !== $amendment['amendment_hash']) {
+        if ($entity->isNew() || $entity->get('amendment_hash') !== $amendment['amendment_hash']) {
             $table->patchEntity($entity, $amendment);
         }
 
@@ -526,7 +526,7 @@ class DataSyncService
 
         $supplement = $apiResponseBody['supplement'];
         $entity->set('last_sync', Date::now());
-        if (!$entity->isNew() && $entity->get('supplement_hash') !== $supplement['supplement_hash']) {
+        if ($entity->isNew() || $entity->get('supplement_hash') !== $supplement['supplement_hash']) {
             $table->patchEntity($entity, $supplement);
         }
 
