@@ -15,7 +15,7 @@ class EntityChecker implements EntityCheckerInterface
     
     protected array $_defaultConfig = [
         'field' => 'last_sync',
-        'interval' => 'P1D',
+        'interval' => 'P2D',
     ];
 
     public function __construct(array $config = [])

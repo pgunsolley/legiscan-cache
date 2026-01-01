@@ -79,7 +79,18 @@ class DataSyncService
     public function syncSessionList(StateAbbreviation $state, ResultSetCheckerInterface $checker): iterable
     {
         $table = $this->fetchTable('SessionListRecords');
-        $entities = $table->find('byStateAbbreviation', stateAbbreviation: $state)->all();
+        $entities = $table
+            ->find()
+            ->select([
+                'session_id',
+                'last_sync',
+                'session_hash',
+            ])
+            ->where([
+                'state_abbr' => $state,
+            ])
+            ->all();
+
         if (!$checker->isSetExpired($entities)) {
             return $entities;
         }
@@ -96,10 +107,6 @@ class DataSyncService
             /** @var \App\Model\Entity\SessionListRecord $entity */
             $entity = $entities->firstMatch([
                 'session_id' => $sessionListItem['session_id'],
-                'state_id' => $sessionListItem['state_id'],
-                'state_abbr' => $sessionListItem['state_abbr'],
-                'year_start' => $sessionListItem['year_start'],
-                'year_end' => $sessionListItem['year_end'],
             ]) ?? $table->newEntity($sessionListItem);
 
             $entity->set('last_sync', $syncDate);
@@ -138,7 +145,6 @@ class DataSyncService
             /** @var \App\Model\Entity\MasterListRecord $entity */
             $entity = $entities->firstMatch([
                 'bill_id' => $masterListItem['bill_id'],
-                'number' => $masterListItem['number'],
             ]) ?? $table->newEntity($masterListItem);
 
             $entity->set('last_sync', $syncDate);
