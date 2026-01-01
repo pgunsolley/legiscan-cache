@@ -420,7 +420,7 @@ class DataSyncService
                 $associatedConfig[] = 'BillRecordCalendars';
             }
 
-            $table->patchEntity($entity, $bill); // FIXME: This line was added before the error, relating to empty last_sync field, appeared
+            $table->patchEntity($entity, $bill);
         }
 
         return $table->saveOrFail($entity, [
