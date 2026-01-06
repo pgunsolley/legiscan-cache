@@ -183,18 +183,21 @@ class DataSyncService
             'BillRecordSessions' => fn(SelectQuery $query) => 
                 $query->select([
                     'id',
+                    'bill_record_id',
                 ])
             ,
             'BillRecordProgresses' => fn(SelectQuery $query) => 
                 $query->select([
                     'id',
+                    'bill_record_id',
                     'date',
-                    'event'
+                    'event',
                 ])
             ,
             'BillRecordCommittees' => fn(SelectQuery $query) => 
                 $query->select([
                     'id',
+                    'bill_record_id',
                     'committee_id',
                     'chamber_id',
                     'name',
@@ -203,6 +206,7 @@ class DataSyncService
             'BillRecordReferrals' => fn(SelectQuery $query) =>
                 $query->select([
                     'id',
+                    'bill_record_id',
                     'date',
                     'committee_id',
                     'chamber_id',
@@ -212,6 +216,7 @@ class DataSyncService
             'BillRecordHistories' => fn(SelectQuery $query) =>
                 $query->select([
                     'id',
+                    'bill_record_id',
                     'date',
                     'chamber_id',
                     'action',
@@ -220,6 +225,7 @@ class DataSyncService
             'BillRecordSponsors' => fn(SelectQuery $query) =>
                 $query->select([
                     'id',
+                    'bill_record_id',
                     'people_id',
                     'party_id',
                     'state_id',
@@ -228,22 +234,26 @@ class DataSyncService
             'BillRecordSponsors.BillRecordSponsorSocials' => fn(SelectQuery $query) =>
                 $query->select([
                     'id',
+                    'bill_record_sponsor_id',
                 ])
             ,
             'BillRecordSponsors.BillRecordSponsorCapitolAddresses' => fn(SelectQuery $query) =>
                 $query->select([
                     'id',
+                    'bill_record_sponsor_id',
                 ])
             ,
             'BillRecordSponsors.BillRecordSponsorLinks' => fn(SelectQuery $query) =>
                 $query->select([
                     'id',
+                    'bill_record_sponsor_id',
                     'bill_record_sponsor_link_type',
                 ])
             ,
             'BillRecordSasts' => fn(SelectQuery $query) =>
                 $query->select([
                     'id',
+                    'bill_record_id',
                     'type_id',
                     'sast_bill_number',
                     'sast_bill_id',
@@ -252,6 +262,7 @@ class DataSyncService
             'BillRecordSubjects' => fn(SelectQuery $query) =>
                 $query->select([
                     'id',
+                    'bill_record_id',
                     'subject_id',
                     'subject_name',
                 ])
@@ -259,6 +270,7 @@ class DataSyncService
             'BillRecordTexts' => fn(SelectQuery $query) =>
                 $query->select([
                     'id',
+                    'bill_record_id',
                     'doc_id',
                     'date',
                     'type_id',
@@ -267,6 +279,7 @@ class DataSyncService
             'BillRecordVotes' => fn(SelectQuery $query) =>
                 $query->select([
                     'id',
+                    'bill_record_id',
                     'roll_call_id',
                     'chamber_id',
                     'date',
@@ -275,6 +288,7 @@ class DataSyncService
             'BillRecordAmendments' => fn(SelectQuery $query) =>
                 $query->select([
                     'id',
+                    'bill_record_id',
                     'amendment_id',
                     'chamber_id',
                     'date',
@@ -284,6 +298,7 @@ class DataSyncService
             'BillRecordSupplements' => fn(SelectQuery $query) =>
                 $query->select([
                     'id',
+                    'bill_record_id',
                     'supplement_id',
                     'date',
                     'type_id',
@@ -293,6 +308,7 @@ class DataSyncService
             'BillRecordCalendars' => fn(SelectQuery $query) =>
                 $query->select([
                     'id',
+                    'bill_record_id',
                     'type_id',
                     'date',
                     'time',
@@ -307,6 +323,7 @@ class DataSyncService
         $entity = $table
             ->find()
             ->select([
+                'id',
                 'bill_id',
                 'last_sync',
                 'change_hash',
