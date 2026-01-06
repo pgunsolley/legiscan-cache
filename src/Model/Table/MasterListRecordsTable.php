@@ -113,9 +113,7 @@ class MasterListRecordsTable extends Table
             ->allowEmptyString('description');
 
         $validator
-            ->date('last_sync')
-            ->requirePresence('last_sync', true)
-            ->notEmptyDate('last_sync');
+            ->date('last_sync');
 
         return $validator;
     }

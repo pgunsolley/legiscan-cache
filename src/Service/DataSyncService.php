@@ -160,7 +160,7 @@ class DataSyncService
                 'bill_id' => $masterListItem['bill_id'],
             ]) ?? $table->newEntity($masterListItem);
 
-            $entity->set([
+            $table->patchEntity($entity, [
                 'last_sync' => $syncDate,
                 'session_id' => $sessionId,
             ]);
