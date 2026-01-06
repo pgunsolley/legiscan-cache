@@ -157,8 +157,6 @@ class AssociationMerger
             if ($matched->isNew()) {
                 $associatedEntities[] = $matched;
             }
-
-            return $matched;
         });
 
         $this->entity->set($property, $associatedEntities);
