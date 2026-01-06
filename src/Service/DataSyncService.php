@@ -18,6 +18,7 @@ use Cake\Collection\CollectionInterface;
 use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\I18n\Date;
 use Cake\ORM\Locator\LocatorAwareTrait;
+use Cake\ORM\Query\SelectQuery;
 use TypeError;
 
 class DataSyncService
@@ -82,6 +83,7 @@ class DataSyncService
         $entities = $table
             ->find()
             ->select([
+                'id',
                 'session_id',
                 'last_sync',
                 'session_hash',
@@ -127,7 +129,18 @@ class DataSyncService
         }
 
         $table = $this->fetchTable('MasterListRecords');
-        $entities = $table->find('bySessionId', sessionId: $sessionId)->all();
+        $entities = $table
+            ->find()
+            ->select([
+                'id',
+                'bill_id',
+                'last_sync',
+                'change_hash',
+            ])
+            ->where([
+                'session_id' => $sessionId,
+            ])
+            ->all();
         if (!$checker->isSetExpired($entities)) {
             return $entities;
         }
@@ -166,13 +179,141 @@ class DataSyncService
             throw new RecordNotFoundException();
         }
 
-        $associatedConfig = [];
+        $associatedConfig = [
+            'BillRecordSessions' => fn(SelectQuery $query) => 
+                $query->select([
+                    'id',
+                ])
+            ,
+            'BillRecordProgresses' => fn(SelectQuery $query) => 
+                $query->select([
+                    'id',
+                    'date',
+                    'event'
+                ])
+            ,
+            'BillRecordCommittees' => fn(SelectQuery $query) => 
+                $query->select([
+                    'id',
+                    'committee_id',
+                    'chamber_id',
+                    'name',
+                ])
+            ,
+            'BillRecordReferrals' => fn(SelectQuery $query) =>
+                $query->select([
+                    'id',
+                    'date',
+                    'committee_id',
+                    'chamber_id',
+                    'name',
+                ])
+            ,
+            'BillRecordHistories' => fn(SelectQuery $query) =>
+                $query->select([
+                    'id',
+                    'date',
+                    'chamber_id',
+                    'action',
+                ])
+            ,
+            'BillRecordSponsors' => fn(SelectQuery $query) =>
+                $query->select([
+                    'id',
+                    'people_id',
+                    'party_id',
+                    'state_id',
+                ])
+            ,
+            'BillRecordSponsors.BillRecordSponsorSocials' => fn(SelectQuery $query) =>
+                $query->select([
+                    'id',
+                ])
+            ,
+            'BillRecordSponsors.BillRecordSponsorCapitolAddresses' => fn(SelectQuery $query) =>
+                $query->select([
+                    'id',
+                ])
+            ,
+            'BillRecordSponsors.BillRecordSponsorLinks' => fn(SelectQuery $query) =>
+                $query->select([
+                    'id',
+                    'bill_record_sponsor_link_type',
+                ])
+            ,
+            'BillRecordSasts' => fn(SelectQuery $query) =>
+                $query->select([
+                    'id',
+                    'type_id',
+                    'sast_bill_number',
+                    'sast_bill_id',
+                ])
+            ,
+            'BillRecordSubjects' => fn(SelectQuery $query) =>
+                $query->select([
+                    'id',
+                    'subject_id',
+                    'subject_name',
+                ])
+            ,
+            'BillRecordTexts' => fn(SelectQuery $query) =>
+                $query->select([
+                    'id',
+                    'doc_id',
+                    'date',
+                    'type_id',
+                ])
+            ,
+            'BillRecordVotes' => fn(SelectQuery $query) =>
+                $query->select([
+                    'id',
+                    'roll_call_id',
+                    'chamber_id',
+                    'date',
+                ])
+            ,
+            'BillRecordAmendments' => fn(SelectQuery $query) =>
+                $query->select([
+                    'id',
+                    'amendment_id',
+                    'chamber_id',
+                    'date',
+                    'title',
+                ])
+            ,
+            'BillRecordSupplements' => fn(SelectQuery $query) =>
+                $query->select([
+                    'id',
+                    'supplement_id',
+                    'date',
+                    'type_id',
+                    'title',
+                ])
+            ,
+            'BillRecordCalendars' => fn(SelectQuery $query) =>
+                $query->select([
+                    'id',
+                    'type_id',
+                    'date',
+                    'time',
+                    'description',
+                ])
+            ,
+        ];
 
         /** @var \App\Model\Table\BillRecordsTable $table */
         $table = $this->fetchTable('BillRecords');
         /** @var \App\Model\Entity\BillRecord $entity */
         $entity = $table
-            ->find('byBillId', billId: $billId)
+            ->find()
+            ->select([
+                'bill_id',
+                'last_sync',
+                'change_hash',
+            ])
+            ->where([
+                'bill_id' => $billId,
+            ])
             ->contain($associatedConfig)
             ->first() ?? $table->newEmptyEntity();
 
@@ -201,7 +342,6 @@ class DataSyncService
                     data: $bill['session'],
                 );
                 unset($bill['session']);
-                $associatedConfig[] = 'BillRecordSessions';
             }
 
             if (array_key_exists('progress', $bill)) {
@@ -214,7 +354,6 @@ class DataSyncService
                     ]),
                 );
                 unset($bill['progress']);
-                $associatedConfig[] = 'BillRecordProgresses';
             }
 
             if (array_key_exists('committee', $bill)) {
@@ -228,7 +367,6 @@ class DataSyncService
                     ]),
                 );
                 unset($bill['committee']);
-                $associatedConfig[] = 'BillRecordCommittees';
             }
 
             if (array_key_exists('referrals', $bill)) {
@@ -243,7 +381,6 @@ class DataSyncService
                     ]),
                 );
                 unset($bill['referrals']);
-                $associatedConfig[] = 'BillRecordReferrals';
             }
 
             if (array_key_exists('history', $bill)) {
@@ -257,7 +394,6 @@ class DataSyncService
                     ]),
                 );
                 unset($bill['history']);
-                $associatedConfig[] = 'BillRecordHistories';
             }
 
             if (array_key_exists('sponsors', $bill)) {
@@ -269,14 +405,13 @@ class DataSyncService
                         'party_id' => $item['party_id'],
                         'state_id' => $item['state_id'],
                     ]),
-                    descend: static function (AssociationMerger $sponsorMerger, array $item) use (&$associatedConfig) {
+                    descend: static function (AssociationMerger $sponsorMerger, array $item) {
                         if (array_key_exists('bio', $item)) {
                             if (array_key_exists('social', $item['bio'])) {
                                 $sponsorMerger->mergeOneToOne(
                                     associationName: 'BillRecordSponsorSocials',
                                     data: $item['bio']['social'],
                                 );
-                                $associatedConfig[] = 'BillRecordSponsors.BillRecordSponsorSocials';
                             }
 
                             if (array_key_exists('capitol_address', $item['bio'])) {
@@ -284,7 +419,6 @@ class DataSyncService
                                     associationName: 'BillRecordSponsorCapitolAddresses',
                                     data: $item['bio']['capitol_address'],
                                 );
-                                $associatedConfig[] = 'BillRecordSponsors.BillRecordSponsorCapitolAddresses';
                             }
 
                             if (array_key_exists('links', $item['bio'])) {
@@ -313,7 +447,6 @@ class DataSyncService
                                         'bill_record_sponsor_link_type' => $item['bill_record_sponsor_link_type'],
                                     ]),
                                 );
-                                $associatedConfig[] = 'BillRecordSponsors.BillRecordSponsorLinks';
                             }
                         }
                     },
@@ -323,7 +456,6 @@ class DataSyncService
                     },
                 );
                 unset($bill['sponsors']);
-                $associatedConfig[] = 'BillRecordSponsors';
             }
 
             if (array_key_exists('sasts', $bill)) {
@@ -337,7 +469,6 @@ class DataSyncService
                     ]),
                 );
                 unset($bill['sasts']);
-                $associatedConfig[] = 'BillRecordSasts';
             }
 
             if (array_key_exists('subjects', $bill)) {
@@ -350,7 +481,6 @@ class DataSyncService
                     ]),
                 );
                 unset($bill['subjects']);
-                $associatedConfig[] = 'BillRecordSubjects';
             }
 
             if (array_key_exists('texts', $bill)) {
@@ -364,7 +494,6 @@ class DataSyncService
                     ]),
                 );
                 unset($bill['texts']);
-                $associatedConfig[] = 'BillRecordTexts';
             }
 
             if (array_key_exists('votes', $bill)) {
@@ -378,7 +507,6 @@ class DataSyncService
                     ]),
                 );
                 unset($bill['votes']);
-                $associatedConfig[] = 'BillRecordVotes';
             }
 
             if (array_key_exists('amendments', $bill)) {
@@ -393,7 +521,6 @@ class DataSyncService
                     ]),
                 );
                 unset($bill['amendments']);
-                $associatedConfig[] = 'BillRecordAmendments';
             }
 
             if (array_key_exists('supplements', $bill)) {
@@ -408,7 +535,6 @@ class DataSyncService
                     ]),
                 );
                 unset($bill['supplements']);
-                $associatedConfig[] = 'BillRecordSupplements';
             }
 
             if (array_key_exists('calendar', $bill)) {
@@ -423,14 +549,13 @@ class DataSyncService
                     ]),
                 );
                 unset($bill['calendar']);
-                $associatedConfig[] = 'BillRecordCalendars';
             }
 
             $table->patchEntity($entity, $bill);
         }
 
         return $table->saveOrFail($entity, [
-            'associated' => $associatedConfig,
+            'associated' => array_keys($associatedConfig),
         ]);
     }
 

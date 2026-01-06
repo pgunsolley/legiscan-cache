@@ -228,9 +228,4 @@ class BillRecordsTable extends Table
         $rules->add($rules->isUnique(['bill_id']));
         return $rules;
     }
-
-    public function findByBillId(SelectQuery $query, int $billId): SelectQuery
-    {
-        return $query->where(['bill_id' => $billId]);
-    }
 }
