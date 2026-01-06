@@ -82,12 +82,7 @@ class DataSyncService
         $table = $this->fetchTable('SessionListRecords');
         $entities = $table
             ->find()
-            ->select([
-                'id',
-                'session_id',
-                'last_sync',
-                'session_hash',
-            ])
+            ->select()
             ->where([
                 'state_abbr' => $state->value,
             ])
@@ -131,12 +126,7 @@ class DataSyncService
         $table = $this->fetchTable('MasterListRecords');
         $entities = $table
             ->find()
-            ->select([
-                'id',
-                'bill_id',
-                'last_sync',
-                'change_hash',
-            ])
+            ->select()
             ->where([
                 'session_id' => $sessionId,
             ])
@@ -182,141 +172,22 @@ class DataSyncService
         }
 
         $associatedConfig = [
-            'BillRecordSessions' => fn(SelectQuery $query) => 
-                $query->select([
-                    'id',
-                    'bill_record_id',
-                ])
-            ,
-            'BillRecordProgresses' => fn(SelectQuery $query) => 
-                $query->select([
-                    'id',
-                    'bill_record_id',
-                    'date',
-                    'event',
-                ])
-            ,
-            'BillRecordCommittees' => fn(SelectQuery $query) => 
-                $query->select([
-                    'id',
-                    'bill_record_id',
-                    'committee_id',
-                    'chamber_id',
-                    'name',
-                ])
-            ,
-            'BillRecordReferrals' => fn(SelectQuery $query) =>
-                $query->select([
-                    'id',
-                    'bill_record_id',
-                    'date',
-                    'committee_id',
-                    'chamber_id',
-                    'name',
-                ])
-            ,
-            'BillRecordHistories' => fn(SelectQuery $query) =>
-                $query->select([
-                    'id',
-                    'bill_record_id',
-                    'date',
-                    'chamber_id',
-                    'action',
-                ])
-            ,
-            'BillRecordSponsors' => fn(SelectQuery $query) =>
-                $query->select([
-                    'id',
-                    'bill_record_id',
-                    'people_id',
-                    'party_id',
-                    'state_id',
-                ])
-            ,
-            'BillRecordSponsors.BillRecordSponsorSocials' => fn(SelectQuery $query) =>
-                $query->select([
-                    'id',
-                    'bill_record_sponsor_id',
-                ])
-            ,
-            'BillRecordSponsors.BillRecordSponsorCapitolAddresses' => fn(SelectQuery $query) =>
-                $query->select([
-                    'id',
-                    'bill_record_sponsor_id',
-                ])
-            ,
-            'BillRecordSponsors.BillRecordSponsorLinks' => fn(SelectQuery $query) =>
-                $query->select([
-                    'id',
-                    'bill_record_sponsor_id',
-                    'bill_record_sponsor_link_type',
-                ])
-            ,
-            'BillRecordSasts' => fn(SelectQuery $query) =>
-                $query->select([
-                    'id',
-                    'bill_record_id',
-                    'type_id',
-                    'sast_bill_number',
-                    'sast_bill_id',
-                ])
-            ,
-            'BillRecordSubjects' => fn(SelectQuery $query) =>
-                $query->select([
-                    'id',
-                    'bill_record_id',
-                    'subject_id',
-                    'subject_name',
-                ])
-            ,
-            'BillRecordTexts' => fn(SelectQuery $query) =>
-                $query->select([
-                    'id',
-                    'bill_record_id',
-                    'doc_id',
-                    'date',
-                    'type_id',
-                ])
-            ,
-            'BillRecordVotes' => fn(SelectQuery $query) =>
-                $query->select([
-                    'id',
-                    'bill_record_id',
-                    'roll_call_id',
-                    'chamber_id',
-                    'date',
-                ])
-            ,
-            'BillRecordAmendments' => fn(SelectQuery $query) =>
-                $query->select([
-                    'id',
-                    'bill_record_id',
-                    'amendment_id',
-                    'chamber_id',
-                    'date',
-                    'title',
-                ])
-            ,
-            'BillRecordSupplements' => fn(SelectQuery $query) =>
-                $query->select([
-                    'id',
-                    'bill_record_id',
-                    'supplement_id',
-                    'date',
-                    'type_id',
-                    'title',
-                ])
-            ,
-            'BillRecordCalendars' => fn(SelectQuery $query) =>
-                $query->select([
-                    'id',
-                    'bill_record_id',
-                    'type_id',
-                    'date',
-                    'time',
-                    'description',
-                ])
-            ,
+            'BillRecordSessions',
+            'BillRecordProgresses',
+            'BillRecordCommittees',
+            'BillRecordReferrals',
+            'BillRecordHistories',
+            'BillRecordSponsors',
+            'BillRecordSponsors.BillRecordSponsorSocials',
+            'BillRecordSponsors.BillRecordSponsorCapitolAddresses',
+            'BillRecordSponsors.BillRecordSponsorLinks',
+            'BillRecordSasts',
+            'BillRecordSubjects',
+            'BillRecordTexts',
+            'BillRecordVotes',
+            'BillRecordAmendments',
+            'BillRecordSupplements',
+            'BillRecordCalendars',
         ];
 
         /** @var \App\Model\Table\BillRecordsTable $table */
@@ -324,12 +195,7 @@ class DataSyncService
         /** @var \App\Model\Entity\BillRecord $entity */
         $entity = $table
             ->find()
-            ->select([
-                'id',
-                'bill_id',
-                'last_sync',
-                'change_hash',
-            ])
+            ->select()
             ->where([
                 'bill_id' => $billId,
             ])
@@ -574,7 +440,7 @@ class DataSyncService
         }
 
         return $table->saveOrFail($entity, [
-            'associated' => array_keys($associatedConfig),
+            'associated' => $associatedConfig,
         ]);
     }
 

@@ -159,8 +159,7 @@ class AmendmentRecordsTable extends Table
             ->allowEmptyString('alt_doc');
 
         $validator
-            ->date('last_sync')
-            ->notEmptyDate('last_sync');
+            ->date('last_sync');
 
         return $validator;
     }
