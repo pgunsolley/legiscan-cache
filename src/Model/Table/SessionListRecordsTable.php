@@ -128,9 +128,7 @@ class SessionListRecordsTable extends Table
             ->allowEmptyString('name');
 
         $validator
-            ->date('last_sync')
-            ->requirePresence('last_sync', true)
-            ->notEmptyDate('last_sync');
+            ->date('last_sync');
 
         return $validator;
     }

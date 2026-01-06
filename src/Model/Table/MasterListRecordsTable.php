@@ -64,8 +64,7 @@ class MasterListRecordsTable extends Table
     public function validationDefault(Validator $validator): Validator
     {
         $validator
-            ->integer('session_id')
-            ->requirePresence('session_id');
+            ->integer('session_id');
 
         $validator
             ->nonNegativeInteger('bill_id')
@@ -125,10 +124,5 @@ class MasterListRecordsTable extends Table
     {
         $rules->add($rules->isUnique(['session_id', 'bill_id']));
         return $rules;
-    }
-
-    public function findBySessionId(SelectQuery $query, int $sessionId): SelectQuery
-    {
-        return $query->where(['session_id' => $sessionId]);
     }
 }

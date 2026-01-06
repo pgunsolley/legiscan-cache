@@ -89,7 +89,7 @@ class DataSyncService
                 'session_hash',
             ])
             ->where([
-                'state_abbr' => $state,
+                'state_abbr' => $state->value,
             ])
             ->all();
 
@@ -160,10 +160,12 @@ class DataSyncService
                 'bill_id' => $masterListItem['bill_id'],
             ]) ?? $table->newEntity($masterListItem);
 
-            $entity->set('last_sync', $syncDate);
-            if ($entity->isNew()) {
-                $entity->set('session_id', $sessionId);
-            } else if ($entity->get('change_hash') !== $masterListItem['change_hash']) {
+            $entity->set([
+                'last_sync' => $syncDate,
+                'session_id' => $sessionId,
+            ]);
+            
+            if (!$entity->isNew() && $entity->get('change_hash') !== $masterListItem['change_hash']) {
                 $table->patchEntity($entity, $masterListItem);
             }
 
