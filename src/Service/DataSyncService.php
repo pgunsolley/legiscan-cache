@@ -18,7 +18,6 @@ use Cake\Collection\CollectionInterface;
 use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\I18n\Date;
 use Cake\ORM\Locator\LocatorAwareTrait;
-use Cake\ORM\Query\SelectQuery;
 use TypeError;
 
 class DataSyncService

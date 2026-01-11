@@ -41,7 +41,7 @@ class AppController extends Controller
         return [JsonView::class];
     }
 
-    public function getSyncData(DataSyncService $dataSyncService)
+    public function getDataSync(DataSyncService $dataSyncService)
     {
         $req = $this->getRequest();
         $query = $req->getQuery();
@@ -49,8 +49,6 @@ class AppController extends Controller
         if (!array_key_exists('op', $query)) {
             throw new BadRequestException('Missing required query: op');
         }
-
-        $this->set('op', $query['op']);
 
         switch ($query['op']) {
             case 'getSessionList':
@@ -114,8 +112,5 @@ class AppController extends Controller
         }
 
         $this->set(compact('data'));
-
-        // TODO: Replace serialization with standard template rendering workflow to build views consistent with legiscan response data
-        $this->viewBuilder()->setOption('serialize', 'data');
     }
 }
