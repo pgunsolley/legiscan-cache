@@ -61,6 +61,8 @@ class AppController extends Controller
                 } catch (ValueError) {
                     throw new BadRequestException('Invalid value for state');
                 }
+
+                $this->viewBuilder()->setTemplate('session_list');
                 break;
 
             case 'getMasterList':
@@ -69,6 +71,7 @@ class AppController extends Controller
                 }
 
                 $data = $dataSyncService->syncMasterList((int)$query['id'], new AllOrNothing());
+                $this->viewBuilder()->setTemplate('master_list');
                 break;
             
             case 'getBill':
@@ -77,6 +80,7 @@ class AppController extends Controller
                 }
 
                 $data = $dataSyncService->syncBill((int)$query['id'], new EntityChecker());
+                $this->viewBuilder()->setTemplate('bill');
                 break;
 
             case 'getBillText':
@@ -85,6 +89,7 @@ class AppController extends Controller
                 }
 
                 $data = $dataSyncService->syncBillText((int)$query['id'], new EntityChecker());
+                $this->viewBuilder()->setTemplate('bill_text');
                 break;
 
             case 'getAmendment':
@@ -93,6 +98,7 @@ class AppController extends Controller
                 }
 
                 $data = $dataSyncService->syncAmendment((int)$query['id'], new EntityChecker());
+                $this->viewBuilder()->setTemplate('amendment');
                 break;
 
             case 'getSupplement':
@@ -101,6 +107,7 @@ class AppController extends Controller
                 }
 
                 $data = $dataSyncService->syncSupplement((int)$query['id'], new EntityChecker());
+                $this->viewBuilder()->setTemplate('supplement');
                 break;
 
             default:
