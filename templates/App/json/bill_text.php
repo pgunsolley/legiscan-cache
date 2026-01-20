@@ -8,7 +8,7 @@ echo json_encode([
     'text' => [
         'doc_id' => $data->doc_id,
         'bill_id' => $data->bill_id,
-        'date' => $data->date->toIso8601String(),
+        'date' => $data->date,
         'type' => $data->type,
         'type_id' => $data->type_id,
         'mime' => $data->mime,

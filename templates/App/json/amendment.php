@@ -11,7 +11,7 @@ echo json_encode([
         'adopted' => $data->adopted,
         'chamber' => $data->chamber,
         'chamber_id' => $data->chamber_id,
-        'date' => $data->date->toIso8601String(),
+        'date' => $data->date,
         'title' => $data->title,
         'description' => $data->description,
         'mime' => $data->mime,

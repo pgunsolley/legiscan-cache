@@ -43,7 +43,7 @@ echo json_encode([
         'status' => $data->status,
         'status_date' => $data->status_date?->toIso8601String(),
         'progress' => array_map(fn(BillRecordProgress $billRecordProgress) => [
-            'date' => $billRecordProgress->date?->toIso8601String(),
+            'date' => $billRecordProgress->date,
             'event' => $billRecordProgress->event,
         ], $data->bill_record_progresses),
         'state' => $data->state,
@@ -65,14 +65,14 @@ echo json_encode([
             'name' => $data->bill_record_committee->name,
         ],
         'referrals' => array_map(fn(BillRecordReferral $billRecordReferral) => [
-            'date' => $billRecordReferral->date?->toIso8601String(),
+            'date' => $billRecordReferral->date,
             'committee_id' => $billRecordReferral->committee_id,
             'chamber' => $billRecordReferral->chamber,
             'chamber_id' => $billRecordReferral->chamber_id,
             'name' => $billRecordReferral->name,
         ], $data->bill_record_referrals),
         'history' => array_map(fn(BillRecordHistory $billRecordHistory) => [
-            'date' => $billRecordHistory->date?->toIso8601String(),
+            'date' => $billRecordHistory->date,
             'action' => $billRecordHistory->action,
             'chamber' => $billRecordHistory->chamber,
             'chamber_id' => $billRecordHistory->chamber_id,
@@ -153,7 +153,7 @@ echo json_encode([
         ], $data->bill_record_subjects),
         'texts' => array_map(fn(BillRecordText $billRecordText) => [
             'doc_id' => $billRecordText->doc_id,
-            'date' => $billRecordText->date?->toIso8601String(),
+            'date' => $billRecordText->date,
             'type' => $billRecordText->type,
             'type_id' => $billRecordText->type_id,
             'mime' => $billRecordText->mime,
@@ -165,7 +165,7 @@ echo json_encode([
         ], $data->bill_record_texts),
         'votes' => array_map(fn(BillRecordVote $billRecordVote) => [
             'roll_call_id' => $billRecordVote->roll_call_id,
-            'date' => $billRecordVote->date?->toIso8601String(),
+            'date' => $billRecordVote->date,
             'desc' => $billRecordVote->desc,
             'yea' => $billRecordVote->yea,
             'nay' => $billRecordVote->nay,
@@ -183,7 +183,7 @@ echo json_encode([
             'adopted' => $billRecordAmendment->adopted,
             'chamber' => $billRecordAmendment->chamber,
             'chamber_id' => $billRecordAmendment->chamber_id,
-            'date' => $billRecordAmendment->date?->toIso8601String(),
+            'date' => $billRecordAmendment->date,
             'title' => $billRecordAmendment->title,
             'description' => $billRecordAmendment->description,
             'mime' => $billRecordAmendment->mime,
@@ -195,7 +195,7 @@ echo json_encode([
         ], $data->bill_record_amendments),
         'supplements' => array_map(fn(BillRecordSupplement $billRecordSupplement) => [
             'supplement_id' => $billRecordSupplement->supplement_id,
-            'date' => $billRecordSupplement->date?->toIso8601String(),
+            'date' => $billRecordSupplement->date,
             'type' => $billRecordSupplement->type,
             'type_id' => $billRecordSupplement->type_id,
             'title' => $billRecordSupplement->title,
@@ -210,7 +210,7 @@ echo json_encode([
         'calendar' => array_map(fn(BillRecordCalendar $billRecordCalendar) => [
             'type_id' => $billRecordCalendar->type_id,
             'type' => $billRecordCalendar->type,
-            'date' => $billRecordCalendar->date?->toIso8601String(),
+            'date' => $billRecordCalendar->date,
             'time' => $billRecordCalendar->time,
             'location' => $billRecordCalendar->location,
             'description' => $billRecordCalendar->description,
