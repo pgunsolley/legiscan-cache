@@ -10,7 +10,7 @@ use Cake\ORM\Entity;
  *
  * @property int $id
  * @property int $bill_record_sponsor_id
- * @property string $bill_record_sponsor_link_type
+ * @property \App\Model\Enum\BillRecordSponsorLinkType $bill_record_sponsor_link_type
  * @property string|null $bluesky
  * @property string|null $facebook
  * @property string|null $instagram

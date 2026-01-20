@@ -35,7 +35,7 @@ use Cake\ORM\Entity;
  *
  * @property \App\Model\Entity\BillRecordAmendment[] $bill_record_amendments
  * @property \App\Model\Entity\BillRecordCalendar[] $bill_record_calendars
- * @property \App\Model\Entity\BillRecordCommittee[] $bill_record_committees
+ * @property \App\Model\Entity\BillRecordCommittee $bill_record_committee
  * @property \App\Model\Entity\BillRecordHistory[] $bill_record_histories
  * @property \App\Model\Entity\BillRecordProgress[] $bill_record_progresses
  * @property \App\Model\Entity\BillRecordReferral[] $bill_record_referrals
@@ -85,7 +85,7 @@ class BillRecord extends Entity
         'last_sync' => true,
         'bill_record_amendments' => true,
         'bill_record_calendars' => true,
-        'bill_record_committees' => true,
+        'bill_record_committee' => true,
         'bill_record_histories' => true,
         'bill_record_progresses' => true,
         'bill_record_referrals' => true,

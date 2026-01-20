@@ -253,14 +253,9 @@ class DataSyncService
             }
 
             if (array_key_exists('committee', $bill)) {
-                $associationMerger->mergeOneToMany(
+                $associationMerger->mergeOneToOne(
                     associationName: 'BillRecordCommittees',
-                    data: $bill['committee'], 
-                    match: fn(CollectionInterface $associated, array $item) => $associated->firstMatch([
-                        'committee_id' => $item['committee_id'],
-                        'chamber_id' => $item['chamber_id'],
-                        'name' => $item['name'],
-                    ]),
+                    data: $bill['committee'],
                 );
                 unset($bill['committee']);
             }

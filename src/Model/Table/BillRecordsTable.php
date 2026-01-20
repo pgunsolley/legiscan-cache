@@ -67,7 +67,7 @@ class BillRecordsTable extends Table
             'foreignKey' => 'bill_record_id',
             'dependent' => true,
         ]);
-        $this->hasMany('BillRecordCommittees', [
+        $this->hasOne('BillRecordCommittees', [
             'foreignKey' => 'bill_record_id',
             'dependent' => true,
         ]);

@@ -58,12 +58,12 @@ echo json_encode([
         'title' => $data->title,
         'description' => $data->description,
         'pending_committee_id' => $data->pending_committee_id,
-        'committee' => array_map(fn(BillRecordCommittee $billRecordCommittee) => [
-            'committee_id' => $billRecordCommittee->committee_id,
-            'chamber' => $billRecordCommittee->chamber,
-            'chamber_id' => $billRecordCommittee->chamber_id,
-            'name' => $billRecordCommittee->name,
-        ], $data->bill_record_committees),
+        'committee' => [
+            'committee_id' => $data->bill_record_committee->committee_id,
+            'chamber' => $data->bill_record_committee->chamber,
+            'chamber_id' => $data->bill_record_committee->chamber_id,
+            'name' => $data->bill_record_committee->name,
+        ],
         'referrals' => array_map(fn(BillRecordReferral $billRecordReferral) => [
             'date' => $billRecordReferral->date?->toIso8601String(),
             'committee_id' => $billRecordReferral->committee_id,
@@ -125,7 +125,7 @@ echo json_encode([
                 'links' => array_reduce(
                     $billRecordSponsor->bill_record_sponsor_links,
                     static function (array $acc, BillRecordSponsorLink $billRecordSponsorLink) {
-                        $acc[$billRecordSponsorLink->bill_record_sponsor_link_type] = [
+                        $acc[$billRecordSponsorLink->bill_record_sponsor_link_type->value] = [
                             'bluesky' => $billRecordSponsorLink->bluesky,
                             'facebook' => $billRecordSponsorLink->facebook,
                             'instagram' => $billRecordSponsorLink->instagram,
