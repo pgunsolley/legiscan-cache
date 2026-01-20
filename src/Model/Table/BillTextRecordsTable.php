@@ -134,6 +134,11 @@ class BillTextRecordsTable extends Table
             ->allowEmptyString('alt_text_size');
 
         $validator
+            ->scalar('alt_text_hash')
+            ->maxLength('alt_text_hash', 255)
+            ->allowEmptyString('alt_text_hash');
+
+        $validator
             ->scalar('alt_doc')
             ->maxLength('alt_doc', 16777215)
             ->allowEmptyString('alt_doc');

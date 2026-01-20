@@ -16,8 +16,10 @@ use App\Service\DataSync\ResultSetCheckerInterface;
 use App\Utility\StateAbbreviation;
 use Cake\Collection\CollectionInterface;
 use Cake\Datasource\Exception\RecordNotFoundException;
+use Cake\Datasource\ResultSetInterface;
 use Cake\I18n\Date;
 use Cake\ORM\Locator\LocatorAwareTrait;
+use Cake\ORM\ResultSet;
 use TypeError;
 
 class DataSyncService
@@ -76,7 +78,7 @@ class DataSyncService
             ->count() > 0;
     }
 
-    public function syncSessionList(StateAbbreviation $state, ResultSetCheckerInterface $checker): iterable
+    public function syncSessionList(StateAbbreviation $state, ResultSetCheckerInterface $checker): ResultSetInterface
     {
         $table = $this->fetchTable('SessionListRecords');
         $entities = $table
@@ -113,10 +115,15 @@ class DataSyncService
             $entitiesToSave[] = $entity;
         }
 
-        return $table->saveManyOrFail($entitiesToSave);
+        $entities = $table->saveManyOrFail($entitiesToSave);
+        if (!($entities instanceof ResultSet)) {
+            $entities = new ResultSet($entities);
+        }
+
+        return $entities;
     }
 
-    public function syncMasterList(int $sessionId, ResultSetCheckerInterface $checker): iterable
+    public function syncMasterList(int $sessionId, ResultSetCheckerInterface $checker): ResultSetInterface
     {
         if (!$this->sessionIdExists($sessionId)) {
             throw new RecordNotFoundException();
@@ -161,7 +168,12 @@ class DataSyncService
             $entitiesToSave[] = $entity;
         }
 
-        return $table->saveManyOrFail($entitiesToSave);
+        $entities = $table->saveManyOrFail($entitiesToSave);
+        if (!($entities instanceof ResultSet)) {
+            $entities = new ResultSet($entities);
+        }
+
+        return $entities;
     }
 
     public function syncBill(int $billId, EntityCheckerInterface $checker): BillRecord

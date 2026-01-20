@@ -26,6 +26,7 @@ use Cake\ORM\Entity;
  * @property int|null $alt_mime_id
  * @property string|null $alt_state_link
  * @property int|null $alt_text_size
+ * @property string|null $alt_text_hash
  * @property string|null $alt_doc
  * @property \Cake\I18n\DateTime $created
  * @property \Cake\I18n\DateTime $modified
@@ -61,6 +62,7 @@ class BillTextRecord extends Entity
         'alt_mime_id' => true,
         'alt_state_link' => true,
         'alt_text_size' => true,
+        'alt_text_hash' => true,
         'alt_doc' => true,
         'created' => true,
         'modified' => true,

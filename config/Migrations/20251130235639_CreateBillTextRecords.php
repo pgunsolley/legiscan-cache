@@ -95,6 +95,10 @@ class CreateBillTextRecords extends BaseMigration
                 'null' => true,
                 'signed' => false,
             ])
+            ->addColumn('alt_text_hash', 'string', [
+                'default' => null,
+                'null' => true,
+            ])
             ->addColumn('alt_doc', 'text', [
                 'default' => null,
                 'null' => true,
