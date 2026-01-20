@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use Cake\Http\Client;
+use Cake\Log\Log;
 
 class LegiscanApiService
 {
@@ -27,6 +28,7 @@ class LegiscanApiService
 
     public function getSessionList(string $state): array
     {
+        Log::info("Fetching new session list for state $state");
         $res = $this->client->get('', [
             'key' => $this->key,
             'op' => 'getSessionList',
@@ -38,6 +40,7 @@ class LegiscanApiService
 
     public function getMasterList(int $sessionId): array
     {
+        Log::info("Fetching new master list for session id $sessionId");
         $res = $this->client->get('', [
             'key' => $this->key,
             'op' => 'getMasterList',
@@ -49,6 +52,7 @@ class LegiscanApiService
 
     public function getBill(int $billId): array
     {
+        Log::info("Fetching new bill for bill id $billId");
         $res = $this->client->get('', [
             'key' => $this->key,
             'op' => 'getBill',
@@ -60,6 +64,7 @@ class LegiscanApiService
 
     public function getBillText(int $docId): array
     {
+        Log::info("Fetching new bill text for doc id $docId");
         $res = $this->client->get('', [
             'key' => $this->key,
             'op' => 'getBillText',
@@ -71,6 +76,7 @@ class LegiscanApiService
 
     public function getAmendment(int $amendmentId): array
     {
+        Log::info("Fetching new amendment for amendment id $amendmentId");
         $res = $this->client->get('', [
             'key' => $this->key,
             'op' => 'getAmendment',
@@ -82,6 +88,7 @@ class LegiscanApiService
 
     public function getSupplement(int $supplementId): array
     {
+        Log::info("Fetching new supplement for supplement id $supplementId");
         $res = $this->client->get('', [
             'key' => $this->key,
             'op' => 'getSupplement',
