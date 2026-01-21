@@ -377,7 +377,17 @@ class DataSyncService
             if (array_key_exists('texts', $bill)) {
                 $associationMerger->mergeOneToMany(
                     associationName: 'BillRecordTexts',
-                    data: $bill['texts'], 
+                    data: $bill['texts'],
+                    // Date strings are sometimes returned as 0000-00-00 instead of null or ''.
+                    // It may be best to centralize response body formatting to handle this
+                    // as it may appear in multiple places and in multiple endpoints.
+                    prepare: fn(array $data) => array_map(fn($item) => [
+                        ...$item,
+                        'date' => array_key_exists('date', $item) ? match($item['date']) {
+                            '0000-00-00' => null,
+                            default => $item['date'],
+                        } : null,
+                    ], $data),
                     match: fn(CollectionInterface $associated, array $item) => $associated->firstMatch([
                         'doc_id' => $item['doc_id'],
                         'date' => $item['date'],
