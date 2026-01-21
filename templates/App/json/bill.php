@@ -6,7 +6,6 @@
 
 use App\Model\Entity\BillRecordAmendment;
 use App\Model\Entity\BillRecordCalendar;
-use App\Model\Entity\BillRecordCommittee;
 use App\Model\Entity\BillRecordHistory;
 use App\Model\Entity\BillRecordProgress;
 use App\Model\Entity\BillRecordReferral;
@@ -24,7 +23,7 @@ echo json_encode([
         'bill_id' => $data->bill_id,
         'change_hash' => $data->change_hash,
         'session_id' => $data->session_id,
-        'session' => [
+        'session' => $data->bill_record_session ? [
             'session_id' => $data->bill_record_session->session_id,
             'state_id' => $data->bill_record_session->state_id,
             'year_start' => $data->bill_record_session->year_start,
@@ -36,7 +35,7 @@ echo json_encode([
             'session_tag' => $data->bill_record_session->session_tag,
             'session_title' => $data->bill_record_session->session_title,
             'session_name' => $data->bill_record_session->session_name,
-        ],
+        ] : null,
         'url' => $data->url,
         'state_link' => $data->state_link,
         'completed' => $data->completed,
@@ -45,7 +44,7 @@ echo json_encode([
         'progress' => array_map(fn(BillRecordProgress $billRecordProgress) => [
             'date' => $billRecordProgress->date,
             'event' => $billRecordProgress->event,
-        ], $data->bill_record_progresses),
+        ], $data->bill_record_progresses ?? []),
         'state' => $data->state,
         'state_id' => $data->state_id,
         'bill_number' => $data->bill_number,
@@ -58,26 +57,26 @@ echo json_encode([
         'title' => $data->title,
         'description' => $data->description,
         'pending_committee_id' => $data->pending_committee_id,
-        'committee' => [
+        'committee' => $data->bill_record_committee ? [
             'committee_id' => $data->bill_record_committee->committee_id,
             'chamber' => $data->bill_record_committee->chamber,
             'chamber_id' => $data->bill_record_committee->chamber_id,
             'name' => $data->bill_record_committee->name,
-        ],
+        ] : null,
         'referrals' => array_map(fn(BillRecordReferral $billRecordReferral) => [
             'date' => $billRecordReferral->date,
             'committee_id' => $billRecordReferral->committee_id,
             'chamber' => $billRecordReferral->chamber,
             'chamber_id' => $billRecordReferral->chamber_id,
             'name' => $billRecordReferral->name,
-        ], $data->bill_record_referrals),
+        ], $data->bill_record_referrals ?? []),
         'history' => array_map(fn(BillRecordHistory $billRecordHistory) => [
             'date' => $billRecordHistory->date,
             'action' => $billRecordHistory->action,
             'chamber' => $billRecordHistory->chamber,
             'chamber_id' => $billRecordHistory->chamber_id,
             'importance' => $billRecordHistory->importance,
-        ], $data->bill_record_histories),
+        ], $data->bill_record_histories ?? []),
         'sponsors' => array_map(fn(BillRecordSponsor $billRecordSponsor) => [
             'people_id' => $billRecordSponsor->people_id,
             'person_hash' => $billRecordSponsor->person_hash,
@@ -104,8 +103,8 @@ echo json_encode([
             'committee_sponsor' => $billRecordSponsor->committee_sponsor,
             'committee_id' => $billRecordSponsor->committee_id,
             'state_federal' => $billRecordSponsor->state_federal,
-            'bio' => [
-                'social' => [
+            'bio' => $billRecordSponsor->bill_record_sponsor_capitol_address || $billRecordSponsor->bill_record_sponsor_links || $billRecordSponsor->bill_record_sponsor_social ? [
+                'social' => $billRecordSponsor->bill_record_sponsor_social ? [
                     'capitol_phone' => $billRecordSponsor->bill_record_sponsor_social->capitol_phone,
                     'district_phone' => $billRecordSponsor->bill_record_sponsor_social->district_phone,
                     'email' => $billRecordSponsor->bill_record_sponsor_social->email,
@@ -114,16 +113,16 @@ echo json_encode([
                     'image' => $billRecordSponsor->bill_record_sponsor_social->image,
                     'ballotpedia' => $billRecordSponsor->bill_record_sponsor_social->ballotpedia,
                     'votesmart' => $billRecordSponsor->bill_record_sponsor_social->votesmart,
-                ],
-                'capitol_address' => [
+                ] : null,
+                'capitol_address' => $billRecordSponsor->bill_record_sponsor_capitol_address ? [
                     'address1' => $billRecordSponsor->bill_record_sponsor_capitol_address->address1,
                     'address2' => $billRecordSponsor->bill_record_sponsor_capitol_address->address2,
                     'city' => $billRecordSponsor->bill_record_sponsor_capitol_address->city,
                     'state' => $billRecordSponsor->bill_record_sponsor_capitol_address->state,
                     'zip' => $billRecordSponsor->bill_record_sponsor_capitol_address->zip,
-                ],
+                ] : null,
                 'links' => array_reduce(
-                    $billRecordSponsor->bill_record_sponsor_links,
+                    $billRecordSponsor->bill_record_sponsor_links ?? [],
                     static function (array $acc, BillRecordSponsorLink $billRecordSponsorLink) {
                         $acc[$billRecordSponsorLink->bill_record_sponsor_link_type->value] = [
                             'bluesky' => $billRecordSponsorLink->bluesky,
@@ -139,18 +138,18 @@ echo json_encode([
                     }, 
                     [],
                 ),
-            ],
-        ], $data->bill_record_sponsors),
+            ] : [],
+        ], $data->bill_record_sponsors ?? []),
         'sasts' => array_map(fn(BillRecordSast $billRecordSast) => [
             'type_id' => $billRecordSast->type_id,
             'type' => $billRecordSast->type,
             'sast_bill_number' => $billRecordSast->sast_bill_number,
             'sast_bill_id' => $billRecordSast->sast_bill_id,
-        ], $data->bill_record_sasts),
+        ], $data->bill_record_sasts ?? []),
         'subjects' => array_map(fn(BillRecordSubject $billRecordSubject) => [
             'subject_id' => $billRecordSubject->subject_id,
             'subject_name' => $billRecordSubject->subject_name,
-        ], $data->bill_record_subjects),
+        ], $data->bill_record_subjects ?? []),
         'texts' => array_map(fn(BillRecordText $billRecordText) => [
             'doc_id' => $billRecordText->doc_id,
             'date' => $billRecordText->date,
@@ -162,7 +161,7 @@ echo json_encode([
             'state_link' => $billRecordText->state_link,
             'text_size' => $billRecordText->text_size,
             'text_hash' => $billRecordText->text_hash,
-        ], $data->bill_record_texts),
+        ], $data->bill_record_texts ?? []),
         'votes' => array_map(fn(BillRecordVote $billRecordVote) => [
             'roll_call_id' => $billRecordVote->roll_call_id,
             'date' => $billRecordVote->date,
@@ -177,7 +176,7 @@ echo json_encode([
             'chamber_id' => $billRecordVote->chamber_id,
             'url' => $billRecordVote->url,
             'state_link' => $billRecordVote->state_link,
-        ], $data->bill_record_votes),
+        ], $data->bill_record_votes ?? []),
         'amendments' => array_map(fn(BillRecordAmendment $billRecordAmendment) => [
             'amendment_id' => $billRecordAmendment->amendment_id,
             'adopted' => $billRecordAmendment->adopted,
@@ -192,7 +191,7 @@ echo json_encode([
             'state_link' => $billRecordAmendment->state_link,
             'amendment_size' => $billRecordAmendment->amendment_size,
             'amendment_hash' => $billRecordAmendment->amendment_hash,
-        ], $data->bill_record_amendments),
+        ], $data->bill_record_amendments ?? []),
         'supplements' => array_map(fn(BillRecordSupplement $billRecordSupplement) => [
             'supplement_id' => $billRecordSupplement->supplement_id,
             'date' => $billRecordSupplement->date,
@@ -206,7 +205,7 @@ echo json_encode([
             'state_link' => $billRecordSupplement->state_link,
             'supplement_size' => $billRecordSupplement->supplement_size,
             'supplement_hash' => $billRecordSupplement->supplement_hash,
-        ], $data->bill_record_supplements),
+        ], $data->bill_record_supplements ?? []),
         'calendar' => array_map(fn(BillRecordCalendar $billRecordCalendar) => [
             'type_id' => $billRecordCalendar->type_id,
             'type' => $billRecordCalendar->type,
@@ -214,6 +213,6 @@ echo json_encode([
             'time' => $billRecordCalendar->time,
             'location' => $billRecordCalendar->location,
             'description' => $billRecordCalendar->description,
-        ], $data->bill_record_calendars),
+        ], $data->bill_record_calendars ?? []),
     ],
 ]);
