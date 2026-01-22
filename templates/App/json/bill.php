@@ -35,7 +35,7 @@ echo json_encode([
             'session_tag' => $data->bill_record_session->session_tag,
             'session_title' => $data->bill_record_session->session_title,
             'session_name' => $data->bill_record_session->session_name,
-        ] : null,
+        ] : (object)[],
         'url' => $data->url,
         'state_link' => $data->state_link,
         'completed' => $data->completed,
@@ -62,7 +62,7 @@ echo json_encode([
             'chamber' => $data->bill_record_committee->chamber,
             'chamber_id' => $data->bill_record_committee->chamber_id,
             'name' => $data->bill_record_committee->name,
-        ] : null,
+        ] : (object)[],
         'referrals' => array_map(fn(BillRecordReferral $billRecordReferral) => [
             'date' => $billRecordReferral->date,
             'committee_id' => $billRecordReferral->committee_id,
@@ -113,14 +113,14 @@ echo json_encode([
                     'image' => $billRecordSponsor->bill_record_sponsor_social->image,
                     'ballotpedia' => $billRecordSponsor->bill_record_sponsor_social->ballotpedia,
                     'votesmart' => $billRecordSponsor->bill_record_sponsor_social->votesmart,
-                ] : null,
+                ] : (object)[],
                 'capitol_address' => $billRecordSponsor->bill_record_sponsor_capitol_address ? [
                     'address1' => $billRecordSponsor->bill_record_sponsor_capitol_address->address1,
                     'address2' => $billRecordSponsor->bill_record_sponsor_capitol_address->address2,
                     'city' => $billRecordSponsor->bill_record_sponsor_capitol_address->city,
                     'state' => $billRecordSponsor->bill_record_sponsor_capitol_address->state,
                     'zip' => $billRecordSponsor->bill_record_sponsor_capitol_address->zip,
-                ] : null,
+                ] : (object)[],
                 'links' => array_reduce(
                     $billRecordSponsor->bill_record_sponsor_links ?? [],
                     static function (array $acc, BillRecordSponsorLink $billRecordSponsorLink) {
