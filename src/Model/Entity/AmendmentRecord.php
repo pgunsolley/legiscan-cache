@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Model\Entity;
 
+use Cake\I18n\Date;
 use Cake\ORM\Entity;
 
 /**
@@ -74,4 +75,13 @@ class AmendmentRecord extends Entity
         'modified' => true,
         'last_sync' => true,
     ];
+
+    protected function _setDate(null|string|Date $date): null|string|Date
+    {
+        if ($date === '0000-00-00') {
+            return null;
+        }
+
+        return $date;
+    }
 }

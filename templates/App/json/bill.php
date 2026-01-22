@@ -138,7 +138,7 @@ echo json_encode([
                     }, 
                     [],
                 ),
-            ] : [],
+            ] : (object)[],
         ], $data->bill_record_sponsors ?? []),
         'sasts' => array_map(fn(BillRecordSast $billRecordSast) => [
             'type_id' => $billRecordSast->type_id,
