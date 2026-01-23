@@ -39,11 +39,11 @@ class CreateBillRecordSupplements extends BaseMigration
                 'null' => true,
                 'signed' => false,
             ])
-            ->addColumn('title', 'string', [
+            ->addColumn('title', 'text', [
                 'default' => null,
                 'null' => true,
             ])
-            ->addColumn('description', 'string', [
+            ->addColumn('description', 'text', [
                 'default' => null,
                 'null' => true,
             ])

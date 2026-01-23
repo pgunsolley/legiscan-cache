@@ -46,11 +46,11 @@ class CreateAmendmentRecords extends BaseMigration
                 'default' => null,
                 'null' => true,
             ])
-            ->addColumn('title', 'string', [
+            ->addColumn('title', 'text', [
                 'default' => null,
                 'null' => true,
             ])
-            ->addColumn('description', 'string', [
+            ->addColumn('description', 'text', [
                 'default' => null,
                 'null' => true,
             ])

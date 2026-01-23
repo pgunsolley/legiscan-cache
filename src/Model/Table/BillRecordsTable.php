@@ -204,12 +204,10 @@ class BillRecordsTable extends Table
 
         $validator
             ->scalar('title')
-            ->maxLength('title', 255)
             ->allowEmptyString('title');
 
         $validator
             ->scalar('description')
-            ->maxLength('description', 255)
             ->allowEmptyString('description');
 
         $validator

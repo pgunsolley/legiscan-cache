@@ -88,7 +88,6 @@ class BillRecordCalendarsTable extends Table
 
         $validator
             ->scalar('description')
-            ->maxLength('description', 255)
             ->allowEmptyString('description');
 
         return $validator;
