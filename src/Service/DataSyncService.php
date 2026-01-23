@@ -445,8 +445,6 @@ class DataSyncService
             $table->patchEntity($entity, $bill);
         }
 
-        dd($entity->bill_record_votes);
-
         return $table->saveOrFail($entity, [
             'associated' => $associatedConfig,
         ]);
