@@ -19,7 +19,6 @@ use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Datasource\ResultSetInterface;
 use Cake\I18n\Date;
 use Cake\ORM\Locator\LocatorAwareTrait;
-use Cake\ORM\ResultSet;
 use TypeError;
 
 class DataSyncService
@@ -93,34 +92,31 @@ class DataSyncService
             return $entities;
         }
 
-        $apiResponseBody = $this->legiscanApiService->getSessionList($state->value);
-        if (!array_key_exists('sessions', $apiResponseBody)) {
-            throw new InvalidResponseBodyException("getSessionList response body missing key 'sessions'");
-        }
-
-        $sessionList = $apiResponseBody['sessions'];
         $syncDate = Date::now();
-        $entitiesToSave = [];
-        foreach ($sessionList as $sessionListItem) {
-            /** @var \App\Model\Entity\SessionListRecord $entity */
-            $entity = $entities->firstMatch([
-                'session_id' => $sessionListItem['session_id'],
-            ]) ?? $table->newEntity($sessionListItem);
+        $apiResponseBody = $this->legiscanApiService->getSessionList($state->value);
 
+        foreach ($entities as $entity) {
             $entity->set('last_sync', $syncDate);
-            if (!$entity->isNew() && $entity->get('session_hash') !== $sessionListItem['session_hash']) {
-                $table->patchEntity($entity, $sessionListItem);
+        }
+
+        if ($apiResponseBody !== null && array_key_exists('sessions', $apiResponseBody)) {
+            $sessionList = $apiResponseBody['sessions'];
+            foreach ($sessionList as $sessionListItem) {
+                /** @var \App\Model\Entity\SessionListRecord $entity */
+                $entity = $entities->firstMatch([
+                    'session_id' => $sessionListItem['session_id'],
+                ]) ?? $table->newEntity($sessionListItem);
+
+                if ($entity->isNew()) {
+                    $entity->set('last_sync', $syncDate);
+                    $entities->appendItem($entity);
+                } else if ($entity->get('session_hash') !== $sessionListItem['session_hash']) {
+                    $table->patchEntity($entity, $sessionListItem);
+                }
             }
-
-            $entitiesToSave[] = $entity;
         }
 
-        $entities = $table->saveManyOrFail($entitiesToSave);
-        if (!($entities instanceof ResultSet)) {
-            $entities = new ResultSet($entities);
-        }
-
-        return $entities;
+        return $table->saveManyOrFail($entities);
     }
 
     public function syncMasterList(int $sessionId, ResultSetCheckerInterface $checker): ResultSetInterface
@@ -137,43 +133,38 @@ class DataSyncService
                 'session_id' => $sessionId,
             ])
             ->all();
+
         if (!$checker->isSetExpired($entities)) {
             return $entities;
         }
 
-        $apiResponseBody = $this->legiscanApiService->getMasterList($sessionId);
-        if (!array_key_exists('masterlist', $apiResponseBody)) {
-            throw new InvalidResponseBodyException("getMasterList response body missing key 'masterlist'");
-        }
-
-        $masterList = $apiResponseBody['masterlist'];
-        unset($masterList['session']);
         $syncDate = Date::now();
-        $entitiesToSave = [];
-        foreach ($masterList as $masterListItem) {
-            /** @var \App\Model\Entity\MasterListRecord $entity */
-            $entity = $entities->firstMatch([
-                'bill_id' => $masterListItem['bill_id'],
-            ]) ?? $table->newEntity($masterListItem);
+        $apiResponseBody = $this->legiscanApiService->getMasterList($sessionId);
 
-            $table->patchEntity($entity, [
-                'last_sync' => $syncDate,
-                'session_id' => $sessionId,
-            ]);
-            
-            if (!$entity->isNew() && $entity->get('change_hash') !== $masterListItem['change_hash']) {
-                $table->patchEntity($entity, $masterListItem);
+        foreach ($entities as $entity) {
+            $entity->set('last_sync', $syncDate);
+        }
+
+        if ($apiResponseBody !== null && array_key_exists('masterlist', $apiResponseBody)) {
+            $masterList = $apiResponseBody['masterlist'];
+            unset($masterList['session']);
+            foreach ($masterList as $masterListItem) {
+                /** @var \App\Model\Entity\MasterListRecord $entity */
+                $entity = $entities->firstMatch([
+                    'bill_id' => $masterListItem['bill_id'],
+                ]) ?? $table->newEntity($masterListItem);
+
+                if ($entity->isNew()) {
+                    $entity->set('last_sync', $syncDate);
+                    $entity->set('session_id', $sessionId);
+                    $entities->appendItem($entity);
+                } else if ($entity->get('change_hash') !== $masterListItem['change_hash']) {
+                    $table->patchEntity($entity, $masterListItem);
+                }
             }
-
-            $entitiesToSave[] = $entity;
         }
 
-        $entities = $table->saveManyOrFail($entitiesToSave);
-        if (!($entities instanceof ResultSet)) {
-            $entities = new ResultSet($entities);
-        }
-
-        return $entities;
+        return $table->saveManyOrFail($entities);
     }
 
     public function syncBill(int $billId, EntityCheckerInterface $checker): BillRecord
@@ -224,14 +215,12 @@ class DataSyncService
         }
 
         $apiResponseBody = $this->legiscanApiService->getBill($billId);
-        if (!array_key_exists('bill', $apiResponseBody)) {
-            throw new InvalidResponseBodyException("getBill response body missing key 'bill'");
-        }
-
         $entity->set('last_sync', Date::now());
-        $bill = $apiResponseBody['bill'];
-        if ($entity->get('change_hash') !== $bill['change_hash']) {
+
+        if ($apiResponseBody !== null && array_key_exists('bill', $apiResponseBody) && ($entity->isNew() || $entity->get('change_hash') !== $apiResponseBody['bill']['change_hash'])) {
+            $bill = $apiResponseBody['bill'];
             $associationMerger = new AssociationMerger($entity);
+
             if (array_key_exists('session', $bill)) {
                 $associationMerger->mergeOneToOne(
                     associationName: 'BillRecordSessions',
@@ -472,12 +461,13 @@ class DataSyncService
         }
 
         $apiResponseBody = $this->legiscanApiService->getBillText($docId);
-        if (!array_key_exists('text', $apiResponseBody)) {
+        $entity->set('last_sync', Date::now());
+
+        if ($apiResponseBody !== null && array_key_exists('text', $apiResponseBody)) {
             throw new InvalidResponseBodyException("getBillText response body missing key 'text'");
         }
 
         $text = $apiResponseBody['text'];
-        $entity->set('last_sync', Date::now());
         if ($entity->isNew() || $entity->get('text_hash') !== $text['text_hash']) {
             $table->patchEntity($entity, $text);
         }

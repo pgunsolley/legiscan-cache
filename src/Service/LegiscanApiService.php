@@ -26,7 +26,7 @@ class LegiscanApiService
         ]);
     }
 
-    public function getSessionList(string $state): array
+    public function getSessionList(string $state): ?array
     {
         Log::info("Fetching new session list for state $state");
         $res = $this->client->get('', [
@@ -35,10 +35,15 @@ class LegiscanApiService
             'state' => $state,
         ]);
 
+        if ($res->getStatusCode() !== 200) {
+            Log::alert("Failed to fetch new sesson list for state $state");
+            return null;
+        }
+
         return $res->getJson() ?? [];
     }
 
-    public function getMasterList(int $sessionId): array
+    public function getMasterList(int $sessionId): ?array
     {
         Log::info("Fetching new master list for session id $sessionId");
         $res = $this->client->get('', [
@@ -47,10 +52,15 @@ class LegiscanApiService
             'id' => $sessionId,
         ]);
 
+        if ($res->getStatusCode() !== 200) {
+            Log::alert("Failed to fetch new master list for session id $sessionId");
+            return null;
+        }
+
         return $res->getJson() ?? [];
     }
 
-    public function getBill(int $billId): array
+    public function getBill(int $billId): ?array
     {
         Log::info("Fetching new bill for bill id $billId");
         $res = $this->client->get('', [
@@ -59,10 +69,15 @@ class LegiscanApiService
             'id' => $billId,
         ]);
 
+        if ($res->getStatusCode() !== 200) {
+            Log::alert("Failed to fetch new bill for id $billId");
+            return null;
+        }
+
         return $res->getJson() ?? [];
     }
 
-    public function getBillText(int $docId): array
+    public function getBillText(int $docId): ?array
     {
         Log::info("Fetching new bill text for doc id $docId");
         $res = $this->client->get('', [
@@ -71,10 +86,15 @@ class LegiscanApiService
             'id' => $docId,
         ]);
 
+        if ($res->getStatusCode() !== 200) {
+            Log::alert("Failed to fetch new bill text for doc id $docId");
+            return null;
+        }
+
         return $res->getJson() ?? [];
     }
 
-    public function getAmendment(int $amendmentId): array
+    public function getAmendment(int $amendmentId): ?array
     {
         Log::info("Fetching new amendment for amendment id $amendmentId");
         $res = $this->client->get('', [
@@ -83,10 +103,15 @@ class LegiscanApiService
             'id' => $amendmentId,
         ]);
 
+        if ($res->getStatusCode() !== 200) {
+            Log::alert("Failed to fetch new amendment for amendment id $amendmentId");
+            return null;
+        }
+
         return $res->getJson() ?? [];
     }
 
-    public function getSupplement(int $supplementId): array
+    public function getSupplement(int $supplementId): ?array
     {
         Log::info("Fetching new supplement for supplement id $supplementId");
         $res = $this->client->get('', [
@@ -94,6 +119,11 @@ class LegiscanApiService
             'op' => 'getSupplement',
             'id' => $supplementId,
         ]);
+
+        if ($res->getStatusCode() !== 200) {
+            Log::alert("Failed to fetch new supplement for supplement id $supplementId");
+            return null;
+        }
 
         return $res->getJson() ?? [];
     }
