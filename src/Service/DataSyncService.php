@@ -463,13 +463,8 @@ class DataSyncService
         $apiResponseBody = $this->legiscanApiService->getBillText($docId);
         $entity->set('last_sync', Date::now());
 
-        if ($apiResponseBody !== null && array_key_exists('text', $apiResponseBody)) {
-            throw new InvalidResponseBodyException("getBillText response body missing key 'text'");
-        }
-
-        $text = $apiResponseBody['text'];
-        if ($entity->isNew() || $entity->get('text_hash') !== $text['text_hash']) {
-            $table->patchEntity($entity, $text);
+        if ($apiResponseBody !== null && array_key_exists('text', $apiResponseBody) && ($entity->isNew() || $entity->get('text_hash') !== $apiResponseBody['text']['text_hash'])) {
+            $table->patchEntity($entity, $apiResponseBody['text']);
         }
 
         return $table->saveOrFail($entity);
@@ -497,14 +492,10 @@ class DataSyncService
         }
 
         $apiResponseBody = $this->legiscanApiService->getAmendment($amendmentId);
-        if (!array_key_exists('amendment', $apiResponseBody)) {
-            throw new InvalidResponseBodyException("getAmendment response body missing key 'amendment'");
-        }
-
-        $amendment = $apiResponseBody['amendment'];
         $entity->set('last_sync', Date::now());
-        if ($entity->isNew() || $entity->get('amendment_hash') !== $amendment['amendment_hash']) {
-            $table->patchEntity($entity, $amendment);
+
+        if ($apiResponseBody !== null && array_key_exists('amendment', $apiResponseBody) && ($entity->isNew() || $entity->get('amendment_hash') !== $apiResponseBody['amendment']['amendment_hash'])) {
+            $table->patchEntity($entity, $apiResponseBody['amendment']);
         }
 
         return $table->saveOrFail($entity);
@@ -532,14 +523,10 @@ class DataSyncService
         }
 
         $apiResponseBody = $this->legiscanApiService->getSupplement($supplementId);
-        if (!array_key_exists('supplement', $apiResponseBody)) {
-            throw new InvalidResponseBodyException("getSupplement response body missing key 'supplement'");
-        }
-
-        $supplement = $apiResponseBody['supplement'];
         $entity->set('last_sync', Date::now());
-        if ($entity->isNew() || $entity->get('supplement_hash') !== $supplement['supplement_hash']) {
-            $table->patchEntity($entity, $supplement);
+
+        if ($apiResponseBody !== null && array_key_exists('supplement', $apiResponseBody) && ($entity->isNew() || $entity->get('supplement_hash') !== $apiResponseBody['supplement']['supplement_hash'])) {
+            $table->patchEntity($entity, $apiResponseBody['supplement']);
         }
 
         return $table->saveOrFail($entity);
