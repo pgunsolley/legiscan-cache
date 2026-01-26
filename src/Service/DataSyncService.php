@@ -11,7 +11,6 @@ use App\Model\Entity\SupplementRecord;
 use App\Model\Enum\BillRecordSponsorLinkType;
 use App\Service\DataSync\AssociationMerger;
 use App\Service\DataSync\EntityCheckerInterface;
-use App\Service\DataSync\Exception\InvalidResponseBodyException;
 use App\Service\DataSync\ResultSetCheckerInterface;
 use App\Utility\StateAbbreviation;
 use Cake\Collection\CollectionInterface;
@@ -19,6 +18,7 @@ use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Datasource\ResultSetInterface;
 use Cake\I18n\Date;
 use Cake\ORM\Locator\LocatorAwareTrait;
+use Cake\ORM\ResultSet;
 use TypeError;
 
 class DataSyncService
@@ -94,6 +94,7 @@ class DataSyncService
 
         $syncDate = Date::now();
         $apiResponseBody = $this->legiscanApiService->getSessionList($state->value);
+        $entities = $entities->toList();
 
         foreach ($entities as $entity) {
             $entity->set('last_sync', $syncDate);
@@ -102,21 +103,18 @@ class DataSyncService
         if ($apiResponseBody !== null && array_key_exists('sessions', $apiResponseBody)) {
             $sessionList = $apiResponseBody['sessions'];
             foreach ($sessionList as $sessionListItem) {
-                /** @var \App\Model\Entity\SessionListRecord $entity */
-                $entity = $entities->firstMatch([
-                    'session_id' => $sessionListItem['session_id'],
-                ]) ?? $table->newEntity($sessionListItem);
+                $entity = array_find($entities, fn($entity) => $entity->get('session_id') === $sessionListItem['session_id']) ?? $table->newEntity($sessionListItem);
 
                 if ($entity->isNew()) {
                     $entity->set('last_sync', $syncDate);
-                    $entities->appendItem($entity);
+                    $entities[] = $entity;
                 } else if ($entity->get('session_hash') !== $sessionListItem['session_hash']) {
                     $table->patchEntity($entity, $sessionListItem);
                 }
             }
         }
 
-        return $table->saveManyOrFail($entities);
+        return new ResultSet($table->saveManyOrFail($entities));
     }
 
     public function syncMasterList(int $sessionId, ResultSetCheckerInterface $checker): ResultSetInterface
@@ -140,6 +138,7 @@ class DataSyncService
 
         $syncDate = Date::now();
         $apiResponseBody = $this->legiscanApiService->getMasterList($sessionId);
+        $entities = $entities->toList();
 
         foreach ($entities as $entity) {
             $entity->set('last_sync', $syncDate);
@@ -149,22 +148,19 @@ class DataSyncService
             $masterList = $apiResponseBody['masterlist'];
             unset($masterList['session']);
             foreach ($masterList as $masterListItem) {
-                /** @var \App\Model\Entity\MasterListRecord $entity */
-                $entity = $entities->firstMatch([
-                    'bill_id' => $masterListItem['bill_id'],
-                ]) ?? $table->newEntity($masterListItem);
+                $entity = array_find($entities, fn($entity) => $entity->get('bill_id') === $masterListItem['bill_id']) ?? $table->newEntity($masterListItem);
 
                 if ($entity->isNew()) {
                     $entity->set('last_sync', $syncDate);
                     $entity->set('session_id', $sessionId);
-                    $entities->appendItem($entity);
+                    $entities[] = $entity;
                 } else if ($entity->get('change_hash') !== $masterListItem['change_hash']) {
                     $table->patchEntity($entity, $masterListItem);
                 }
             }
         }
 
-        return $table->saveManyOrFail($entities);
+        return new ResultSet($table->saveManyOrFail($entities));
     }
 
     public function syncBill(int $billId, EntityCheckerInterface $checker): BillRecord
