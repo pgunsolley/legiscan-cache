@@ -31,5 +31,6 @@ use Cake\Routing\RouteBuilder;
  */
 return function (RouteBuilder $routes): void {
     $routes->setRouteClass(DashedRoute::class);
-    $routes->get('/', ['controller' => 'DataSync', 'action' => 'getDataSync']);
+    $routes->get('/data-sync', ['controller' => 'DataSync', 'action' => 'getDataSync']);
+    $routes->resources('SessionListRecords');
 };

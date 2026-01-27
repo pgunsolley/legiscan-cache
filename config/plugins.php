@@ -1,13 +1,15 @@
 <?php
+
 return [
     'DebugKit' => [
-        'onlyDebug' => true
+        'onlyDebug' => true,
     ],
     'Bake' => [
         'onlyCli' => true,
-        'optional' => true
+        'optional' => true,
     ],
     'Migrations' => [
-        'onlyCli' => true
-    ]
+        'onlyCli' => true,
+    ],
+    'Crud' => [],
 ];
