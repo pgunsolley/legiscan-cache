@@ -139,8 +139,13 @@ class SessionListRecordsTable extends Table
         return $rules;
     }
 
-    public function findByStateAbbreviation(SelectQuery $query, StateAbbreviation $stateAbbreviation): SelectQuery
+    public function findByState(SelectQuery $query, StateAbbreviation $stateAbbreviation): SelectQuery
     {
         return $query->where(['state_abbr' => $stateAbbreviation->value]);
+    }
+
+    public function countByState(StateAbbreviation $stateAbbreviation): int
+    {
+        return $this->find('byState', $stateAbbreviation)->count();
     }
 }
