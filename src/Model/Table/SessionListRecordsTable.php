@@ -144,8 +144,20 @@ class SessionListRecordsTable extends Table
         return $query->where(['state_abbr' => $stateAbbreviation->value]);
     }
 
+    public function findBySessionId(SelectQuery $query, int $sessionId): SelectQuery
+    {
+        return $query->where(['session_id' => $sessionId]);
+    }
+
     public function countByState(StateAbbreviation $stateAbbreviation): int
     {
-        return $this->find('byState', $stateAbbreviation)->count();
+        return $this->find('byState', stateAbbreviation: $stateAbbreviation)->count();
+    }
+
+    public function existsForSessionId(int $sessionId)
+    {
+        return $this->exists([
+            'session_id' => $sessionId,
+        ]);
     }
 }

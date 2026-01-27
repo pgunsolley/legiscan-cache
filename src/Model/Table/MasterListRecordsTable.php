@@ -121,4 +121,16 @@ class MasterListRecordsTable extends Table
         $rules->add($rules->isUnique(['session_id', 'bill_id']));
         return $rules;
     }
+
+    public function findBySessionId(SelectQuery $query, int $sessionId): SelectQuery
+    {
+        return $query->where(['session_id' => $sessionId]);
+    }
+
+    public function existsForSessionId(int $sessionId)
+    {
+        return $this->exists([
+            'session_id' => $sessionId,
+        ]);
+    }
 }

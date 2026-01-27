@@ -33,4 +33,5 @@ return function (RouteBuilder $routes): void {
     $routes->setRouteClass(DashedRoute::class);
     $routes->get('/data-sync', ['controller' => 'DataSync', 'action' => 'getDataSync']);
     $routes->resources('SessionListRecords');
+    $routes->resources('MasterListRecords');
 };
