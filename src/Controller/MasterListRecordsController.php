@@ -7,7 +7,6 @@ use App\Service\DataSync\ResultSetChecker\AllOrNothing;
 use App\Service\DataSyncService;
 use Cake\Event\EventInterface;
 use Cake\Http\Exception\BadRequestException;
-use Cake\Http\Exception\NotFoundException;
 use Crud\Controller\ControllerTrait;
 
 /**
