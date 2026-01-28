@@ -85,7 +85,6 @@ class BillRecordProgressesTable extends Table
     public function buildRules(RulesChecker $rules): RulesChecker
     {
         $rules->add($rules->existsIn(['bill_record_id'], 'BillRecords'), ['errorField' => 'bill_record_id']);
-        $rules->add($rules->isUnique(['bill_record_id', 'date', 'event']));
         return $rules;
     }
 }
