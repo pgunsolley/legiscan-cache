@@ -58,6 +58,7 @@ class BillRecordsTable extends Table
         $this->setPrimaryKey('id');
 
         $this->addBehavior('Timestamp');
+        $this->addBehavior('Pick');
 
         $this->hasMany('BillRecordAmendments', [
             'foreignKey' => 'bill_record_id',
@@ -230,5 +231,10 @@ class BillRecordsTable extends Table
     public function findByBillId(SelectQuery $query, int $billId): SelectQuery
     {
         return $query->where(['bill_id' => $billId]);
+    }
+
+    public function existsForBillId(int $billId): bool
+    {
+        return $this->exists(['bill_id' => $billId]);
     }
 }

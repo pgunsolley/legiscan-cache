@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Service\DataSync\EntityChecker;
 use App\Service\DataSyncService;
-use Cake\Http\Exception\BadRequestException;
 
 /**
  * BillRecords Controller
@@ -13,11 +13,20 @@ use Cake\Http\Exception\BadRequestException;
  */
 class BillRecordsController extends AppController
 {
+    public function initialize(): void
+    {
+        parent::initialize();
+        $this->loadComponent('Pick');
+    }
+
     public function view(DataSyncService $dataSyncService, int $billId)
     {
-        $req = $this->getRequest();
-        $pick = $req->getQuery('pick');
-        
-        
+        if (!$this->BillRecords->existsForBillId($billId)) {
+            $dataSyncService->syncBill($billId, new EntityChecker());
+        }
+
+        $data = $this->BillRecords->find('byBillId', billId: $billId)->first();
+        $this->viewBuilder()->setOption('serialize', 'data');
+        $this->set(compact('data'));
     }
 }
