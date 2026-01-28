@@ -34,4 +34,5 @@ return function (RouteBuilder $routes): void {
     $routes->get('/data-sync', ['controller' => 'DataSync', 'action' => 'getDataSync']);
     $routes->resources('SessionListRecords');
     $routes->resources('MasterListRecords');
+    $routes->resources('BillRecords');
 };
