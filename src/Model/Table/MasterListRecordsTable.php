@@ -44,6 +44,7 @@ class MasterListRecordsTable extends Table
         $this->setPrimaryKey('id');
 
         $this->addBehavior('Timestamp');
+        $this->addBehavior('Pick');
         
         $this->belongsTo('SessionListRecords', [
             'foreignKey' => 'session_id',

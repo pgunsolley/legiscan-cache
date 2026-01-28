@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Model\Table;
 
-use Cake\Database\Query\SelectQuery;
+use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
@@ -225,5 +225,10 @@ class BillRecordsTable extends Table
     {
         $rules->add($rules->isUnique(['bill_id']));
         return $rules;
+    }
+
+    public function findByBillId(SelectQuery $query, int $billId): SelectQuery
+    {
+        return $query->where(['bill_id' => $billId]);
     }
 }

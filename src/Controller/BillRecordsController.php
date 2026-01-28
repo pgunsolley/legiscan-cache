@@ -3,7 +3,8 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use Crud\Controller\ControllerTrait;
+use App\Service\DataSyncService;
+use Cake\Http\Exception\BadRequestException;
 
 /**
  * BillRecords Controller
@@ -12,14 +13,11 @@ use Crud\Controller\ControllerTrait;
  */
 class BillRecordsController extends AppController
 {
-    use ControllerTrait;
-
-    public function initialize(): void
+    public function view(DataSyncService $dataSyncService, int $billId)
     {
-        parent::initialize();
-        $this->loadComponent('Crud.Crud', [
-            'actions' => ['Crud.View'],
-            'listeners' => ['Crud.Api'],
-        ]);
+        $req = $this->getRequest();
+        $pick = $req->getQuery('pick');
+        
+        
     }
 }
