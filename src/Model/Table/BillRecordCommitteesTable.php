@@ -45,6 +45,8 @@ class BillRecordCommitteesTable extends Table
         $this->setPrimaryKey('id');
 
         $this->addBehavior('Timestamp');
+        $this->addBehavior('Pick');
+        $this->addBehavior('BillRecordAssociation');
 
         $this->belongsTo('BillRecords', [
             'foreignKey' => 'bill_record_id',
