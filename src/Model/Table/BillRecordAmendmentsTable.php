@@ -44,8 +44,6 @@ class BillRecordAmendmentsTable extends Table
         $this->setDisplayField('title');
         $this->setPrimaryKey('id');
 
-        $this->addBehavior('Timestamp');
-
         $this->belongsTo('BillRecords', [
             'foreignKey' => 'bill_record_id',
             'joinType' => 'INNER',
@@ -54,6 +52,10 @@ class BillRecordAmendmentsTable extends Table
             'foreignKey' => 'amendment_id',
             'bindingKey' => 'amendment_id',
         ]);
+
+        $this->addBehavior('Timestamp');
+        $this->addBehavior('Pick');
+        $this->addBehavior('BillRecordAssociation');
     }
 
     /**
