@@ -38,4 +38,5 @@ return function (RouteBuilder $routes): void {
     $routes->resources('BillRecordAmendments');
     $routes->resources('BillRecordCalendars');
     $routes->resources('BillRecordCommittees');
+    $routes->resources('BillRecordHistories');
 };
