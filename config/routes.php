@@ -36,4 +36,5 @@ return function (RouteBuilder $routes): void {
     $routes->resources('MasterListRecords');
     $routes->resources('BillRecords');
     $routes->resources('BillRecordAmendments');
+    $routes->resources('BillRecordCalendars');
 };
