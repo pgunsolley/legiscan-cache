@@ -55,7 +55,6 @@ class BillRecordAmendmentsTable extends Table
 
         $this->addBehavior('Timestamp');
         $this->addBehavior('Pick');
-        $this->addBehavior('BillRecordAssociation');
     }
 
     /**

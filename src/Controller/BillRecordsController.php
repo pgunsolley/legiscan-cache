@@ -5,6 +5,7 @@ namespace App\Controller;
 
 use App\Service\DataSync\EntityChecker;
 use App\Service\DataSyncService;
+use Cake\Utility\Inflector;
 
 /**
  * BillRecords Controller
@@ -26,6 +27,17 @@ class BillRecordsController extends AppController
         }
 
         $data = $this->BillRecords->find('byBillId', billId: $billId)->first();
+        $this->viewBuilder()->setOption('serialize', 'data');
+        $this->set(compact('data'));
+    }
+
+    public function indexAssociation(int $billRecordId, string $associationName)
+    {
+        $data = $this
+            ->BillRecords
+            ->getAssociation(Inflector::pluralize(Inflector::classify(Inflector::underscore($associationName))))
+            ->find()
+            ->where(['bill_record_id' => $billRecordId]);
         $this->viewBuilder()->setOption('serialize', 'data');
         $this->set(compact('data'));
     }

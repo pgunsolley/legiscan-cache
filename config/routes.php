@@ -21,24 +21,29 @@
  * @license       https://opensource.org/licenses/mit-license.php MIT License
  */
 
+use Cake\ORM\TableRegistry;
 use Cake\Routing\Route\DashedRoute;
 use Cake\Routing\RouteBuilder;
+use Cake\Utility\Inflector;
 
-/*
- * This file is loaded in the context of the `Application` class.
- * So you can use `$this` to reference the application class instance
- * if required.
- */
 return function (RouteBuilder $routes): void {
     $routes->setRouteClass(DashedRoute::class);
     $routes->get('/data-sync', ['controller' => 'DataSync', 'action' => 'getDataSync']);
-    $routes->resources('SessionListRecords');
-    $routes->resources('MasterListRecords');
-    $routes->resources('BillRecords');
-    $routes->resources('BillRecordAmendments');
-    $routes->resources('BillRecordCalendars');
-    $routes->resources('BillRecordCommittees');
-    $routes->resources('BillRecordHistories');
-    $routes->resources('BillRecordProgresses');
-    $routes->resources('BillRecordReferrals');
+    $routes->resources('SessionListRecords', ['path' => 'session-list', 'only' => ['index']]);
+    $routes->resources('MasterListRecords', ['path' => 'master-list', 'only' => ['index']]);
+    $routes->scope('/bills', static function (RouteBuilder $routes) {
+        $routes
+            ->get('/{billId}', ['controller' => 'BillRecords', 'action' => 'view'])
+            ->setPatterns([
+                'billId' => '\d+',
+            ])
+            ->setPass(['billId']);
+        $routes
+            ->get('/{billRecordId}/{associationName}', ['controller' => 'BillRecords', 'action' => 'indexAssociation'])
+            ->setPatterns([
+                'billRecordId' => '\d+',
+                'associationName' => join('|', array_map(fn($association) => Inflector::dasherize($association), TableRegistry::getTableLocator()->get('BillRecords')->associations()->keys())),
+            ])
+            ->setPass(['billRecordId', 'associationName']);
+    });
 };
