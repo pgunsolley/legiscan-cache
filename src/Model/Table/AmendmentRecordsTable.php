@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Model\Table;
 
+use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
@@ -43,6 +44,7 @@ class AmendmentRecordsTable extends Table
         $this->setPrimaryKey('id');
 
         $this->addBehavior('Timestamp');
+        $this->addBehavior('Pick');
 
         $this->belongsTo('BillRecordAmendments', [
             'foreignKey' => 'amendment_id',
@@ -166,5 +168,15 @@ class AmendmentRecordsTable extends Table
     {
         $rules->add($rules->isUnique(['amendment_id', 'bill_id']));
         return $rules;
+    }
+
+    public function findByAmendmentId(SelectQuery $query, int $amendmentId): SelectQuery
+    {
+        return $query->where(['amendment_id' => $amendmentId]);
+    }
+
+    public function existsForAmendmentId(int $amendmentId): bool
+    {
+        return $this->exists(['amendment_id' => $amendmentId]);
     }
 }

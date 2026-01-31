@@ -32,6 +32,9 @@ class BillRecordsController extends AppController
 
     public function indexAssociation(int $billRecordId, string $associationName)
     {
+        // TODO: Add pagination for *Many associations
+        // TODO: Return object for hasOne associations
+
         $association = $this
             ->BillRecords
             ->getAssociation(Inflector::pluralize(Inflector::classify(Inflector::underscore($associationName))));
