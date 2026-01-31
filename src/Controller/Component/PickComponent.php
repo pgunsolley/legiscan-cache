@@ -18,18 +18,17 @@ class PickComponent extends Component
      * @var array<string, mixed>
      */
     protected array $_defaultConfig = [
-        'separator' => ','
+        'query' => 'pick',
     ];
 
     public function beforeFilter(EventInterface $event): void
     {
         $controller = $this->getController();
-        $pick = $controller->getRequest()->getQuery('pick');
-        if (empty($pick)) {
+        $pickedColumns = $controller->getRequest()->getQuery($this->getConfig('query'));
+        if (empty($pickedColumns)) {
             return;
         }
 
-        $pickedColumns = explode($this->getConfig('separator'), $pick);
         $table = $controller->fetchTable();
         if (!$table->hasBehavior('Pick')) {
             throw new InternalErrorException(sprintf('Table %s does not have PickBehavior', $table->getAlias()));

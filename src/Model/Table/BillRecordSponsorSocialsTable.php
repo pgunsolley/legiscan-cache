@@ -45,6 +45,7 @@ class BillRecordSponsorSocialsTable extends Table
         $this->setPrimaryKey('id');
 
         $this->addBehavior('Timestamp');
+        $this->addBehavior('Pick');
 
         $this->belongsTo('BillRecordSponsors', [
             'foreignKey' => 'bill_record_sponsor_id',

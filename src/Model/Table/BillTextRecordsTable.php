@@ -43,6 +43,8 @@ class BillTextRecordsTable extends Table
         $this->setPrimaryKey('id');
 
         $this->addBehavior('Timestamp');
+        $this->addBehavior('Pick');
+
         $this->belongsTo('BillRecordTexts', [
             'foreignKey' => 'doc_id',
             'bindingKey' => 'doc_id',

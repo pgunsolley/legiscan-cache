@@ -14,17 +14,13 @@ use Cake\Utility\Inflector;
  */
 class BillRecordsController extends AppController
 {
-    public function initialize(): void
-    {
-        parent::initialize();
-        $this->loadComponent('Pick');
-    }
-
     public function view(DataSyncService $dataSyncService, int $billId)
     {
         if (!$this->BillRecords->existsForBillId($billId)) {
             $dataSyncService->syncBill($billId, new EntityChecker());
         }
+
+        $this->BillRecords->pick($this->getRequest()->getQuery('pick'));
 
         $data = $this->BillRecords->find('byBillId', billId: $billId)->first();
         $this->viewBuilder()->setOption('serialize', 'data');
@@ -33,9 +29,11 @@ class BillRecordsController extends AppController
 
     public function indexAssociation(int $billRecordId, string $associationName)
     {
-        $data = $this
+        $association = $this
             ->BillRecords
-            ->getAssociation(Inflector::pluralize(Inflector::classify(Inflector::underscore($associationName))))
+            ->getAssociation(Inflector::pluralize(Inflector::classify(Inflector::underscore($associationName))));
+        $association->pick($this->getRequest()->getQuery('pick'));
+        $data = $association
             ->find()
             ->where(['bill_record_id' => $billRecordId]);
         $this->viewBuilder()->setOption('serialize', 'data');

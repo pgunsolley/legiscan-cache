@@ -43,6 +43,7 @@ class SupplementRecordsTable extends Table
         $this->setPrimaryKey('id');
 
         $this->addBehavior('Timestamp');
+        $this->addBehavior('Pick');
 
         $this->belongsTo('BillRecordSupplements', [
             'foreignKey' => 'supplement_id',

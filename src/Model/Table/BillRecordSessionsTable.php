@@ -45,6 +45,7 @@ class BillRecordSessionsTable extends Table
         $this->setPrimaryKey('id');
 
         $this->addBehavior('Timestamp');
+        $this->addBehavior('Pick');
 
         $this->belongsTo('BillRecords', [
             'foreignKey' => 'bill_record_id',

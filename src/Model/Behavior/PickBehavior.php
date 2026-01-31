@@ -22,6 +22,7 @@ class PickBehavior extends Behavior
      */
     protected array $_defaultConfig = [
         'pickable' => [],
+        'separator' => ',',
     ];
 
     private array $picked = [];
@@ -43,8 +44,11 @@ class PickBehavior extends Behavior
         return $pickable;
     }
 
-    public function pick(array $picked): void
+    public function pick(array|string $picked): void
     {
+        if (is_string($picked)) {
+            $picked = explode($this->getConfig('separator'), $picked);
+        }
         $notAllowed = array_diff($picked, $this->getPickable());
         if (count($notAllowed) > 0) {
             throw new BadRequestException(sprintf('The following picked fields are invalid: %s', join(', ', $notAllowed)));
