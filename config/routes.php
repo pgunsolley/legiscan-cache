@@ -31,6 +31,7 @@ return function (RouteBuilder $routes): void {
     $routes->get('/data-sync', ['controller' => 'DataSync', 'action' => 'getDataSync']);
     $routes->resources('SessionListRecords', ['path' => 'session-list', 'only' => ['index']]);
     $routes->resources('MasterListRecords', ['path' => 'master-list', 'only' => ['index']]);
+    $routes->resources('BillTextRecords', ['only' => ['view']]);
     $routes->scope('/bills', static function (RouteBuilder $routes) {
         $routes
             ->get('/{billId}', ['controller' => 'BillRecords', 'action' => 'view'])

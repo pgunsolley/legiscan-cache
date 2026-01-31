@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Model\Table;
 
+use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
@@ -155,5 +156,15 @@ class BillTextRecordsTable extends Table
     {
         $rules->add($rules->isUnique(['doc_id', 'bill_id']));
         return $rules;
+    }
+
+    public function existsForDocId(int $docId): bool
+    {
+        return $this->exists(['doc_id' => $docId]);
+    }
+
+    public function findByDocId(SelectQuery $query, $docId): SelectQuery
+    {
+        return $query->where(['doc_id' => $docId]);
     }
 }
