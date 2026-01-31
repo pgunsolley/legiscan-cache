@@ -20,7 +20,10 @@ class BillRecordsController extends AppController
             $dataSyncService->syncBill($billId, new EntityChecker());
         }
 
-        $this->BillRecords->pick($this->getRequest()->getQuery('pick'));
+        $pickedColumns = $this->getRequest()->getQuery('pick');
+        if (!empty($pickedColumns)) {
+            $this->BillRecords->pick($pickedColumns);
+        }
 
         $data = $this->BillRecords->find('byBillId', billId: $billId)->first();
         $this->viewBuilder()->setOption('serialize', 'data');
@@ -32,7 +35,12 @@ class BillRecordsController extends AppController
         $association = $this
             ->BillRecords
             ->getAssociation(Inflector::pluralize(Inflector::classify(Inflector::underscore($associationName))));
-        $association->pick($this->getRequest()->getQuery('pick'));
+
+        $pickedColumns = $this->getRequest()->getQuery('pick');
+        if (!empty($pickedColumns)) {
+            $association->pick($pickedColumns);
+        }
+
         $data = $association
             ->find()
             ->where(['bill_record_id' => $billRecordId]);
