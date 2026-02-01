@@ -29,24 +29,21 @@ use Cake\Utility\Inflector;
 return function (RouteBuilder $routes): void {
     $routes->setRouteClass(DashedRoute::class);
     $routes->get('/data-sync', ['controller' => 'DataSync', 'action' => 'getDataSync']);
-    $routes->resources('SessionListRecords', ['path' => 'session-list', 'only' => ['index']]);
-    $routes->resources('MasterListRecords', ['path' => 'master-list', 'only' => ['index']]);
+    $routes->resources('SessionListRecords', ['only' => ['index']]);
+    $routes->resources('MasterListRecords', ['only' => ['index']]);
     $routes->resources('BillTextRecords', ['only' => ['view']]);
     $routes->resources('AmendmentRecords', ['only' => ['view']]);
     $routes->resources('SupplementRecords', ['only' => ['view']]);
-    $routes->scope('/bills', static function (RouteBuilder $routes) {
-        $routes
-            ->get('/{billId}', ['controller' => 'BillRecords', 'action' => 'view'])
-            ->setPatterns([
-                'billId' => '\d+',
-            ])
-            ->setPass(['billId']);
-        $routes
-            ->get('/{billRecordId}/{associationName}', ['controller' => 'BillRecords', 'action' => 'indexAssociation'])
-            ->setPatterns([
-                'billRecordId' => '\d+',
-                'associationName' => join('|', array_map(fn($association) => Inflector::dasherize($association), TableRegistry::getTableLocator()->get('BillRecords')->associations()->keys())),
-            ])
-            ->setPass(['billRecordId', 'associationName']);
-    });
+    $routes
+        ->get('/{billId}', ['controller' => 'BillRecords', 'action' => 'view'])
+        ->setPatterns([
+            'billId' => '\d+',
+        ])
+        ->setPass(['billId']);
+    $routes
+        ->get('/{billRecordAssociation}', ['controller' => 'BillRecords', 'action' => 'getAssociation'])
+        ->setPatterns([
+            'billRecordAssociation' => join('|', array_map(fn($association) => Inflector::dasherize($association), TableRegistry::getTableLocator()->get('BillRecords')->associations()->keys())),
+        ])
+        ->setPass(['billRecordAssociation']);
 };
