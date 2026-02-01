@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Model\Table;
 
+use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
@@ -163,5 +164,15 @@ class SupplementRecordsTable extends Table
     {
         $rules->add($rules->isUnique(['supplement_id', 'bill_id']));
         return $rules;
+    }
+
+    public function findBySupplementId(SelectQuery $query, int $supplementId): SelectQuery
+    {
+        return $query->where(['supplement_id' => $supplementId]);
+    }
+
+    public function existsForSupplementId(int $supplementId): bool
+    {
+        return $this->exists(['supplement_id' => $supplementId]);
     }
 }

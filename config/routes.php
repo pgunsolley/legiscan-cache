@@ -32,6 +32,8 @@ return function (RouteBuilder $routes): void {
     $routes->resources('SessionListRecords', ['path' => 'session-list', 'only' => ['index']]);
     $routes->resources('MasterListRecords', ['path' => 'master-list', 'only' => ['index']]);
     $routes->resources('BillTextRecords', ['only' => ['view']]);
+    $routes->resources('AmendmentRecords', ['only' => ['view']]);
+    $routes->resources('SupplementRecords', ['only' => ['view']]);
     $routes->scope('/bills', static function (RouteBuilder $routes) {
         $routes
             ->get('/{billId}', ['controller' => 'BillRecords', 'action' => 'view'])
