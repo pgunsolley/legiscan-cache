@@ -3,59 +3,53 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Service\DataSync\EntityChecker;
-use App\Service\DataSyncService;
 use Cake\Http\Exception\BadRequestException;
 use Cake\ORM\Association;
 use Cake\Utility\Inflector;
 
 /**
- * BillRecords Controller
+ * BillRecordSponsors Controller
  *
- * @property \App\Model\Table\BillRecordsTable $BillRecords
+ * @property \App\Model\Table\BillRecordSponsorsTable $BillRecordSponsors
  */
-class BillRecordsController extends AppController
+class BillRecordSponsorsController extends AppController
 {
-    public function view(DataSyncService $dataSyncService)
-    {
-        $billId = (int)$this->request->getQuery('billId');
-        if (empty($billId)) {
-            throw new BadRequestException('Missing required query: billId');
-        }
-
-        if (!$this->BillRecords->existsForBillId($billId)) {
-            $dataSyncService->syncBill($billId, new EntityChecker());
-        }
-
-        $pickedColumns = $this->getRequest()->getQuery('pick');
-        if (!empty($pickedColumns)) {
-            $this->BillRecords->pick($pickedColumns);
-        }
-
-        $data = $this->BillRecords->find('byBillId', billId: $billId)->first();
-        $this->viewBuilder()->setOption('serialize', 'data');
-        $this->set(compact('data'));
-    }
-
-    public function getAssociation(string $associationName)
+    public function view()
     {
         $billRecordId = (int)$this->request->getQuery('billRecordId');
         if (empty($billRecordId)) {
             throw new BadRequestException('Missing required query: billRecordId');
         }
 
+        $pickedColumns = $this->getRequest()->getQuery('pick');
+        if (!empty($pickedColumns)) {
+            $this->BillRecordSponsors->pick($pickedColumns);
+        }
+
+        $data = $this->BillRecordSponsors->findByBillRecordId($billRecordId);
+        $this->viewBuilder()->setOption('serialize', ['data']);
+        $this->set(compact('data'));
+    }
+
+    public function getAssociation(string $associationName)
+    {
+        $billRecordSponsorId = $this->request->getQuery('billRecordSponsorId');
+        if (empty($billRecordSponsorId)) {
+            throw new BadRequestException('Missing required query: billRecordSponsorId');
+        }
+
         $association = $this
-            ->BillRecords
+            ->BillRecordSponsors
             ->getAssociation(Inflector::pluralize(Inflector::classify(Inflector::underscore($associationName))));
 
-        $pickedColumns = $this->getRequest()->getQuery('pick');
+        $pickedColumns = $this->request->getQuery('pick');
         if (!empty($pickedColumns)) {
             $association->pick($pickedColumns);
         }
 
         $data = $association
             ->find()
-            ->where(['bill_record_id' => $billRecordId]);
+            ->where(['bill_record_sponsor_id' => $billRecordSponsorId]);
 
         if (in_array($association->type(), [Association::ONE_TO_ONE, Association::MANY_TO_ONE])) {
             $data = $data->first();

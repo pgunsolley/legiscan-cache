@@ -21,10 +21,8 @@
  * @license       https://opensource.org/licenses/mit-license.php MIT License
  */
 
-use Cake\ORM\TableRegistry;
 use Cake\Routing\Route\DashedRoute;
 use Cake\Routing\RouteBuilder;
-use Cake\Utility\Inflector;
 
 return function (RouteBuilder $routes): void {
     $routes->setRouteClass(DashedRoute::class);
@@ -34,16 +32,35 @@ return function (RouteBuilder $routes): void {
     $routes->resources('BillTextRecords', ['only' => ['view']]);
     $routes->resources('AmendmentRecords', ['only' => ['view']]);
     $routes->resources('SupplementRecords', ['only' => ['view']]);
-    $routes
-        ->get('/{billId}', ['controller' => 'BillRecords', 'action' => 'view'])
-        ->setPatterns([
-            'billId' => '\d+',
-        ])
-        ->setPass(['billId']);
+    $routes->get('/bill-records', ['controller' => 'BillRecords', 'action' => 'view']);
     $routes
         ->get('/{billRecordAssociation}', ['controller' => 'BillRecords', 'action' => 'getAssociation'])
         ->setPatterns([
-            'billRecordAssociation' => join('|', array_map(fn($association) => Inflector::dasherize($association), TableRegistry::getTableLocator()->get('BillRecords')->associations()->keys())),
+            'billRecordAssociation' => join('|', [
+                'bill-record-amendments',
+                'bill-record-calendars',
+                'bill-record-committees',
+                'bill-record-histories',
+                'bill-record-progresses',
+                'bill-record-referrals',
+                'bill-record-sasts',
+                'bill-record-sessions',
+                'bill-record-subjects',
+                'bill-record-supplements',
+                'bill-record-texts',
+                'bill-record-votes',
+            ]),
         ])
         ->setPass(['billRecordAssociation']);
+    $routes->get('/bill-record-sponsors', ['controller' => 'BillRecordSponsors', 'action' => 'view']);
+    $routes
+        ->get('/{billRecordSponsorAssociation}', ['controller' => 'BillRecordSponsors', 'action' => 'getAssociation'])
+        ->setPatterns([
+            'billRecordSponsorAssociation' => join('|', [
+                'bill-record-sponsor-socials',
+                'bill-record-sponsor-capitol-addresses',
+                'bill-record-sponsor-links',
+            ]),
+        ])
+        ->setPass(['billRecordSponsorAssociation']);
 };
