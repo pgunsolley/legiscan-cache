@@ -32,35 +32,6 @@ return function (RouteBuilder $routes): void {
     $routes->resources('BillTextRecords', ['only' => ['view']]);
     $routes->resources('AmendmentRecords', ['only' => ['view']]);
     $routes->resources('SupplementRecords', ['only' => ['view']]);
+    $routes->resources('BillRecordSponsors', ['only' => ['index']]);
     $routes->get('/bill-records', ['controller' => 'BillRecords', 'action' => 'view']);
-    $routes
-        ->get('/{billRecordAssociation}', ['controller' => 'BillRecords', 'action' => 'getAssociation'])
-        ->setPatterns([
-            'billRecordAssociation' => join('|', [
-                'bill-record-amendments',
-                'bill-record-calendars',
-                'bill-record-committees',
-                'bill-record-histories',
-                'bill-record-progresses',
-                'bill-record-referrals',
-                'bill-record-sasts',
-                'bill-record-sessions',
-                'bill-record-subjects',
-                'bill-record-supplements',
-                'bill-record-texts',
-                'bill-record-votes',
-            ]),
-        ])
-        ->setPass(['billRecordAssociation']);
-    $routes->get('/bill-record-sponsors', ['controller' => 'BillRecordSponsors', 'action' => 'view']);
-    $routes
-        ->get('/{billRecordSponsorAssociation}', ['controller' => 'BillRecordSponsors', 'action' => 'getAssociation'])
-        ->setPatterns([
-            'billRecordSponsorAssociation' => join('|', [
-                'bill-record-sponsor-socials',
-                'bill-record-sponsor-capitol-addresses',
-                'bill-record-sponsor-links',
-            ]),
-        ])
-        ->setPass(['billRecordSponsorAssociation']);
 };
