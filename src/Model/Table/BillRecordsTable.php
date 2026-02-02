@@ -237,4 +237,9 @@ class BillRecordsTable extends Table
     {
         return $this->exists(['bill_id' => $billId]);
     }
+
+    public function existsForPrimaryKey(int $id): bool
+    {
+        return $this->exists(['id' => $id]);
+    }
 }

@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Service\DataSync\EntityChecker;
+use App\Service\DataSyncService;
 use Cake\Event\EventInterface;
 use Cake\Http\Exception\BadRequestException;
 
@@ -23,11 +25,15 @@ class BillRecordSponsorsController extends AppController
         $this->loadComponent('Pick');
     }
 
-    public function index()
+    public function index(DataSyncService $dataSyncService)
     {
         $billRecordId = (int)$this->request->getQuery('billRecordId');
         if (empty($billRecordId)) {
             throw new BadRequestException('Missing required query: billRecordId');
+        }
+
+        if (!$this->BillRecordSponsors->BillRecords->existsForPrimaryKey($billRecordId)) {
+            $dataSyncService->syncBill($billRecordId, new EntityChecker());
         }
 
         $this->Crud->on('beforePaginate', static function (EventInterface $event) use ($billRecordId) {
