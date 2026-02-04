@@ -3,8 +3,9 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Listener\BillRecordAssociationListener;
 use Cake\Event\EventInterface;
-use Cake\Http\Exception\BadRequestException;
+use Crud\Controller\ControllerTrait;
 
 /**
  * BillRecordSponsors Controller
@@ -13,28 +14,24 @@ use Cake\Http\Exception\BadRequestException;
  */
 class BillRecordSponsorsController extends AppController
 {
+    use ControllerTrait;
+
     public function initialize(): void
     {
         parent::initialize();
         $this->loadComponent('Crud.Crud', [
             'actions' => ['Crud.Index'],
-            'listeners' => ['Crud.Api', 'Crud.ApiPagination'],
+            'listeners' => ['Crud.Api', 'Crud.ApiPagination', BillRecordAssociationListener::class],
         ]);
         $this->loadComponent('Pick');
     }
 
     public function index()
     {
-        $billRecordId = (int)$this->request->getQuery('billRecordId');
-        if (empty($billRecordId)) {
-            throw new BadRequestException('Missing required query: billRecordId');
-        }
-
-        $this->Crud->on('beforePaginate', static function (EventInterface $event) use ($billRecordId) {
+        $this->Crud->on('beforePaginate', static function (EventInterface $event) {
             $event
                 ->getSubject()
                 ->query
-                ->find('byBillRecordId', billRecordId: $billRecordId)
                 ->contain([
                     'BillRecordSponsorSocials',
                     'BillRecordSponsorCapitolAddresses',
