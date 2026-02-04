@@ -33,5 +33,19 @@ return function (RouteBuilder $routes): void {
     $routes->resources('AmendmentRecords', ['only' => ['view']]);
     $routes->resources('SupplementRecords', ['only' => ['view']]);
     $routes->resources('BillRecordSponsors', ['only' => ['index']]);
-    $routes->get('/bill-records', ['controller' => 'BillRecords', 'action' => 'view']);
+    $routes
+        ->get('/bill-records/{billId}', ['controller' => 'BillRecords', 'action' => 'view'])
+        ->setPass(['billId'])
+        ->setPatterns(['billId' => '\d+']);
+    $routes->resources('BillRecordAmendments', ['only' => ['index']]);
+    $routes->resources('BillRecordCalendars', ['onlly' => ['index']]);
+    $routes->resources('BillRecordHistories', ['only' => ['index']]);
+    $routes->resources('BillRecordProgresses', ['only' => ['index']]);
+    $routes->resources('BillRecordReferrals', ['only' => ['index']]);
+    $routes->resources('BillRecordSasts', ['only' => ['index']]);
+    $routes->resources('BillRecordSponsors', ['only' => ['index']]);
+    $routes->resources('BillRecordSubjects', ['only' => ['index']]);
+    $routes->resources('BillRecordSupplements', ['only' => ['index']]);
+    $routes->resources('BillRecordTexts', ['only' => ['index']]);
+    $routes->resources('BillRecordVotes', ['only' => ['index']]);
 };

@@ -28,7 +28,8 @@ class BillRecordsController extends AppController
         $data = $this
             ->BillRecords
             ->find('byBillId', billId: $billId)
-            ->contain(['BillRecordCommittees', 'BillRecordSessions']);
+            ->contain(['BillRecordCommittees', 'BillRecordSessions'])
+            ->first();
         $this->viewBuilder()->setOption('serialize', 'data');
         $this->set(compact('data'));
     }
