@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Test\TestCase\Service\DataSync;
 
 use App\Service\DataSync\EntityChecker;
+use Cake\Datasource\Exception\MissingPropertyException;
 use Cake\I18n\Date;
 use Cake\ORM\Entity;
 use PHPUnit\Framework\TestCase;
@@ -12,6 +13,19 @@ use TypeError;
 
 class EntityCheckerTest extends TestCase
 {
+    public function testIsEntityExpired_entityIsMissingTargetField(): void
+    {
+        $checker = new EntityChecker();
+        $mockEntity = $this->createMock(Entity::class);
+        $mockEntity
+            ->expects($this->once())
+            ->method('get')
+            ->with('last_sync')
+            ->willReturn(null);
+        $this->expectException(MissingPropertyException::class);
+        $checker->isEntityExpired($mockEntity);
+    }
+
     public function testIsEntityExpired_entityIsExpired(): void
     {
         $checker = new EntityChecker();
