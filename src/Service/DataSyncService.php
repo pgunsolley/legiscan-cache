@@ -19,7 +19,6 @@ use Cake\Datasource\ResultSetInterface;
 use Cake\I18n\Date;
 use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\ORM\ResultSet;
-use TypeError;
 
 class DataSyncService
 {
@@ -88,7 +87,7 @@ class DataSyncService
             ])
             ->all();
 
-        if (!$checker->isSetExpired($entities)) {
+        if ($entities->count() > 0 && !$checker->isSetExpired($entities)) {
             return $entities;
         }
 
@@ -132,7 +131,7 @@ class DataSyncService
             ])
             ->all();
 
-        if (!$checker->isSetExpired($entities)) {
+        if ($entities->count() > 0 && !$checker->isSetExpired($entities)) {
             return $entities;
         }
 
@@ -200,14 +199,8 @@ class DataSyncService
             ->contain($associatedConfig)
             ->first() ?? $table->newEmptyEntity();
 
-        try {
-            if (!$checker->isEntityExpired($entity)) {
-                return $entity;
-            }
-        } catch (TypeError $e) {
-            if (!$entity->isNew()) {
-                throw $e;
-            }
+        if (!$entity->isNew() && !$checker->isEntityExpired($entity)) {
+            return $entity;
         }
 
         $apiResponseBody = $this->legiscanApiService->getBill($billId);
@@ -446,14 +439,8 @@ class DataSyncService
         /** @var \App\Model\Entity\BillTextRecord */
         $entity = $table->find()->where(['doc_id' => $docId])->first() ?? $table->newEmptyEntity();
 
-        try {
-            if (!$checker->isEntityExpired($entity)) {
-                return $entity;
-            }
-        } catch (TypeError $e) {
-            if (!$entity->isNew()) {
-                throw $e;
-            }
+        if (!$entity->isNew() && !$checker->isEntityExpired($entity)) {
+            return $entity;
         }
 
         $apiResponseBody = $this->legiscanApiService->getBillText($docId);
@@ -477,14 +464,8 @@ class DataSyncService
         /** @var \App\Model\Entity\AmendmentRecord */
         $entity = $table->find()->where(['amendment_id' => $amendmentId])->first() ?? $table->newEmptyEntity();
 
-        try {
-            if (!$checker->isEntityExpired($entity)) {
-                return $entity;
-            }
-        } catch (TypeError $e) {
-            if (!$entity->isNew()) {
-                throw $e;
-            }
+        if (!$entity->isNew() && !$checker->isEntityExpired($entity)) {
+            return $entity;
         }
 
         $apiResponseBody = $this->legiscanApiService->getAmendment($amendmentId);
@@ -508,14 +489,8 @@ class DataSyncService
         /** @var \App\Model\Entity\SupplementRecord */
         $entity = $table->find()->where(['supplement_id' => $supplementId])->first() ?? $table->newEmptyEntity();
 
-        try {
-            if (!$checker->isEntityExpired($entity)) {
-                return $entity;
-            }
-        } catch (TypeError $e) {
-            if (!$entity->isNew()) {
-                throw $e;
-            }
+        if (!$entity->isNew() && !$checker->isEntityExpired($entity)) {
+            return $entity;
         }
 
         $apiResponseBody = $this->legiscanApiService->getSupplement($supplementId);
