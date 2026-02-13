@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\Test\TestCase\Service;
 
+use App\Service\DataSync\EntityChecker;
+use App\Service\DataSync\ResultSetChecker\AllOrNothing;
 use App\Service\LegiscanApiService;
 use App\Utility\StateAbbreviation;
 use Cake\ORM\Query\SelectQuery;
@@ -14,17 +16,23 @@ class DataSyncServiceTest extends TestCase
 {
     public function testSyncSessionList_noExistingEntities_makeRequestToLegiscan_saveNewEntities()
     {
-        $state = StateAbbreviation::Alabama;
+        $usState = StateAbbreviation::Alabama;
 
         $stubLegiscanApiService = $this->createStub(LegiscanApiService::class);
         $stubLegiscanApiService
             ->method('getSessionList')
-            ->with($state)
+            ->with($usState)
             ->willReturn([
-                // TODO: Write fixture
+                'foo' => 'bar',
             ]);
 
         $stubResultSet = $this->createStub(ResultSet::class);
+
+        $stubAllOrNothingStrategy = $this->createStub(AllOrNothing::class);
+        $stubAllOrNothingStrategy
+            ->method('isResultSetExpired')
+            ->with()
+            ->willReturn(false);
 
         $stubSelectQuery = $this->createStub(SelectQuery::class);
         $stubSelectQuery
@@ -33,7 +41,7 @@ class DataSyncServiceTest extends TestCase
             ->willReturn($stubSelectQuery);
         $stubSelectQuery
             ->method('where')
-            ->with(['state_abbr' => $state])
+            ->with(['state_abbr' => $usState])
             ->willReturn($stubSelectQuery);
         $stubSelectQuery
             ->method('all')
