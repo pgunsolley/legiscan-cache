@@ -57,13 +57,14 @@ class DataSyncServiceTest extends TestCase
             ->willReturn($stubSelectQuery);
 
         $stubTableLocator = $this->createStub(TableLocator::class);
+
+        /*
         $stubTableLocator
             ->method('get')
             ->with()
 
-        $service = new DataSyncService($stubLegiscanApiService);
 
-        // $service->setTableLocator()
-        $service->syncSessionList($usState, $stubAllOrNothingStrategy);
+        TODO: Finish later
+        */
     }
 }
