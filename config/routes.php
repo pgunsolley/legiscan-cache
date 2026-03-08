@@ -38,7 +38,7 @@ return function (RouteBuilder $routes): void {
         ->setPass(['billId'])
         ->setPatterns(['billId' => '\d+']);
     $routes->resources('BillRecordAmendments', ['only' => ['index']]);
-    $routes->resources('BillRecordCalendars', ['onlly' => ['index']]);
+    $routes->resources('BillRecordCalendars', ['only' => ['index']]);
     $routes->resources('BillRecordHistories', ['only' => ['index']]);
     $routes->resources('BillRecordProgresses', ['only' => ['index']]);
     $routes->resources('BillRecordReferrals', ['only' => ['index']]);
